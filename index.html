@@ -1,0 +1,159 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta charset="utf-8"></meta>
+    <title>Tutorial 1: Getting Started</title>
+    <script src="lib/cytoscape.js"></script>
+    <script src="lib/dagre.js"></script>
+    <script src="lib/cytoscape-dagre.js"></script>
+    <script src="lib/cytoscape-edgehandles.js"></script>
+    <script src="lib/cytoscape-cxtmenu.js"></script>
+</head>
+
+<style>
+    #cy {
+        width: 100%;
+        height: 90%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+    #namer {
+        width: 100%;
+        height: 10%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+</style>
+<body>
+    <div id="cy"></div>
+    <input type="text" id="namer">
+    <script>
+        var cy = cytoscape({
+          container: document.getElementById('cy'),
+          style: [
+            {
+              selector: 'node',
+              style: {
+                shape: 'ellipse',
+                'border-color':'black',
+                'border-width':'2',
+                'background-color': 'white',
+                label: 'data(name)'
+              }
+            },
+            {
+              selector: 'node[obsType="observed"]',
+              style: {'background-color': 'grey'}
+            },
+            {
+              selector: 'node[obsType="unobserved"]',
+              style: {'background-color': 'white'}
+            }
+          ],
+          layout: {
+            name: 'dagre',
+          },
+        });
+
+      cy.filter('node[!obsType]').data('obsType', 'observed')
+
+      var obsCommand = { // example command
+        content: 'Observe', // html/text content to be displayed in the menu
+        select: function(ele) { // a function to execute when the command is selected
+          ele.data('obsType', 'observed')
+        },
+      } 
+
+      var unobsCommand = { // example command
+        content: 'Unobserve', // html/text content to be displayed in the menu
+        select: function(ele) { // a function to execute when the command is selected
+          ele.data('obsType', 'unobserved')
+        },
+      }
+
+      var rmCommand = {
+        content: 'Remove',
+        select: function(ele) {
+          ele.remove()
+        }
+      }
+
+      var eh = cy.edgehandles({})
+      eh.disable()
+      cy.on('ehstop', function(){ eh.disable() })
+      var edgeCommand = {
+        content: 'Edge',
+        select: function(ele) {
+          console.log("en")
+          eh.enable()
+          eh.start(ele) 
+        }
+      }
+  
+      variableNameIndex = 0;
+      variableNames = 'abcdefghijklmnopqrstuvwyz'
+      var getVariableName = function() {
+        variableNameIndex += 1
+        return variableNames[variableNameIndex % 26]+Math.floor(variableNameIndex/26)
+      }
+
+      var obsNodeCommand = {
+        content: 'Observed Node',
+        select: function(ele, ev) {
+          cy.add({ data: { 'name': getVariableName(), 'obsType': 'observed' }, position: ev.position })
+        }
+      }
+
+      var unobsNodeCommand = {
+        content: 'Unobserved Node',
+        select: function(ele, ev) {
+          cy.add({ data: {'name': getVariableName(), 'obsType': 'unobserved' }, position: ev.position })
+        }
+      }
+      var namer = document.getElementById("namer")
+      var nameCommand = {
+        content: 'Name',
+        select: function(ele) {
+          ele.data('name', namer.value)
+          namer.value = '' 
+        }
+      }
+
+      var obsMenuDefaults = {
+        selector: 'node[obsType = "observed"]',
+        commands: [edgeCommand, unobsCommand, rmCommand, nameCommand] 
+      }
+      var obsMenu = cy.cxtmenu(obsMenuDefaults)
+
+      var unobsMenuDefaults = {
+        selector: 'node[obsType = "unobserved"]',
+        commands: [edgeCommand, obsCommand, rmCommand, nameCommand] 
+      }
+      var unobsMenu = cy.cxtmenu(unobsMenuDefaults)
+
+      var edgeMenuDefaults = {
+        selector: 'edge',
+        commands: [rmCommand, nameCommand] 
+      }
+      var edgeMenu = cy.cxtmenu(edgeMenuDefaults)
+
+
+
+      var coreMenuDefaults = {
+        selector: 'core',
+        commands: [unobsNodeCommand, obsNodeCommand],
+      }
+      var coreMenu = cy.cxtmenu(coreMenuDefaults)
+
+      document.onkeyup = function(e) {
+        var c = String.fromCharCode(e.which);
+        if (c.toLowerCase() === 'l') {
+          cy.layout({ name: 'dagre' }).run()
+        }
+      }
+    </script>
+</body>
