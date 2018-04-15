@@ -21,16 +21,32 @@
         left: 0px;
     }
     #namer {
-        width: 100%;
+        width: 50%;
         height: 10%;
         position: absolute;
-        top: 0px;
+        top: 90%;
         left: 0px;
+    }
+    #export{
+        width: 25%;
+        height: 10%;
+        position: absolute;
+        top: 90%;
+        left: 50%;
+    }
+    #import{
+        width: 25%;
+        height: 10%;
+        position: absolute;
+        top: 90%;
+        left: 75%;
     }
 </style>
 <body>
     <div id="cy"></div>
     <input type="text" id="namer">
+    <button type="button" id="export">Export</button>
+    <input type="file" id="import">
     <script>
         var cy = cytoscape({
           container: document.getElementById('cy'),
@@ -141,8 +157,6 @@
       }
       var edgeMenu = cy.cxtmenu(edgeMenuDefaults)
 
-
-
       var coreMenuDefaults = {
         selector: 'core',
         commands: [unobsNodeCommand, obsNodeCommand],
@@ -154,6 +168,57 @@
         if (c.toLowerCase() === 'l') {
           cy.layout({ name: 'dagre' }).run()
         }
+      }
+
+      function download(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+
+        if (document.createEvent) {
+            var event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            pom.dispatchEvent(event);
+        }
+        else {
+            pom.click();
+        }
+      }
+        
+      downloadGraph = function() {
+        exportGraph = cy.json()
+        exportString = JSON.stringify(exportGraph)
+        filename = (!!namer.value.trim()) ? namer.value + '.json' : 'graph.json'
+        download(filename, exportString)
+        //uriContent = 'data:application/octet-stream,'+encodeURIComponent(exportString)
+        //newWindow = window.open(uriContent, 'graphExport.json')
+      }
+
+      document.getElementById("export").onclick = downloadGraph 
+
+      var importInput = document.getElementById("import")
+      importInput.onchange = function() {
+        if (!importInput.files || !importInput.files[0]) { return; }
+        file = importInput.files[0]
+        var reader = new FileReader()
+        reader.onload = function(e) {
+          var contents = e.target.result;
+          importGraph = JSON.parse(contents)
+          console.log(importGraph)
+          cy.json(importGraph)
+        }
+        reader.readAsText(file)
+      }
+
+      window.addEventListener('beforeunload', function(e) {
+        localStorage.setItem('graphCache', JSON.stringify(cy.json()))
+      })
+
+      cachedGraph = localStorage.getItem('graphCache')
+      if(cachedGraph){
+        console.log("Loaded cached graph")
+        console.log(cachedGraph)
+        cy.json(JSON.parse(cachedGraph))
       }
     </script>
 </body>
