@@ -48,48 +48,68 @@
     <button type="button" id="export">Export</button>
     <input type="file" id="import">
     <script>
-        var cy = cytoscape({
-          container: document.getElementById('cy'),
-          style: [
-            {
-              selector: 'node',
-              style: {
-                shape: 'ellipse',
-                'border-color':'black',
-                'border-width':'2',
-                'background-color': 'white',
-                label: 'data(name)'
-              }
-            },
-            {
-              selector: 'node[obsType="observed"]',
-              style: {'background-color': 'grey'}
-            },
-            {
-              selector: 'node[obsType="unobserved"]',
-              style: {'background-color': 'white'}
-            }
-          ],
-          layout: {
-            name: 'dagre',
-          },
-        });
+      defaultStyle = [
+        {
+          selector: 'node',
+          style: {
+            shape: 'ellipse',
+            'border-width':'2',
+            'background-color': 'white',
+            label: function(ele) { return ele.data('name')+'_'+(ele.data('inc')|' ') }
+          }
+        },
+        {
+          selector: 'node[color]',
+          style: {'border-color':'data(color)'}
+        },
+        {
+          selector: 'node[nodeType="evidence"]',
+          style: {'background-color': 'grey'}
+        },
+        {
+          selector: 'node[nodeType="latent"]',
+          style: {'background-color': 'white'}
+        },
+        {
+          selector: 'node[nodeType="query"]',
+          style: {'background-color': 'blue'}
+        },
+        {
+          selector: 'edge',
+          style: { 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'grey' }
+        }
+      ]
 
-      cy.filter('node[!obsType]').data('obsType', 'observed')
+      style = defaultStyle
+      var cy = cytoscape({
+        container: document.getElementById('cy'),
+        style: style, 
+        layout: {
+          name: 'dagre',
+        },
+      });
 
-      var obsCommand = { // example command
-        content: 'Observe', // html/text content to be displayed in the menu
-        select: function(ele) { // a function to execute when the command is selected
-          ele.data('obsType', 'observed')
+
+      var latentCommand = {
+        content: 'Latent', 
+        select: function(ele) {
+          ele.data('nodeType', 'latent')
         },
       } 
 
-      var unobsCommand = { // example command
-        content: 'Unobserve', // html/text content to be displayed in the menu
-        select: function(ele) { // a function to execute when the command is selected
-          ele.data('obsType', 'unobserved')
+      var queryCommand = {
+        content: 'Query', 
+        select: function(ele) { 
+          ele.data('nodeType', 'query')
         },
-      }
+      } 
+
+      var evidenceCommand = {
+        content: 'Evidence',
+        select: function(ele) {
+          ele.data('nodeType', 'evidence')
+        },
+      } 
 
       var rmCommand = {
         content: 'Remove',
@@ -104,7 +124,6 @@
       var edgeCommand = {
         content: 'Edge',
         select: function(ele) {
-          console.log("en")
           eh.enable()
           eh.start(ele) 
         }
@@ -114,22 +133,47 @@
       variableNames = 'abcdefghijklmnopqrstuvwyz'
       var getVariableName = function() {
         variableNameIndex += 1
-        return variableNames[variableNameIndex % 26]+Math.floor(variableNameIndex/26)
+        return variableNames[variableNameIndex % 26]
       }
 
-      var obsNodeCommand = {
+      prepareLabel = function(labelText) {
+
+      }
+
+      var evidenceNodeCommand = {
         content: 'Observed Node',
         select: function(ele, ev) {
-          cy.add({ data: { 'name': getVariableName(), 'obsType': 'observed' }, position: ev.position })
+          var nodeName = getVariableName() 
+          prepareLabel(nodeName)
+          cy.add({ data: { 'name': nodeName, 'inc': 0, 'nodeType': 'evidence' }, position: ev.position })
         }
       }
 
-      var unobsNodeCommand = {
-        content: 'Unobserved Node',
+      var queryNodeCommand = {
+        content: 'Query Node',
         select: function(ele, ev) {
-          cy.add({ data: {'name': getVariableName(), 'obsType': 'unobserved' }, position: ev.position })
+          var nodeName = getVariableName() 
+          prepareLabel(nodeName)
+          cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'query' }, position: ev.position })
         }
       }
+
+      var latentNodeCommand = {
+        content: 'Query Node',
+        select: function(ele, ev) {
+          var nodeName = getVariableName() 
+          prepareLabel(nodeName)
+          cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'query' }, position: ev.position })
+        }
+      }
+
+      var layoutCommand = {
+        content: 'Layout',
+        select: function() {
+          cy.layout({ name: 'dagre' }).run()
+        }
+      }
+
       var namer = document.getElementById("namer")
       var nameCommand = {
         content: 'Name',
@@ -139,27 +183,153 @@
         }
       }
 
-      var obsMenuDefaults = {
-        selector: 'node[obsType = "observed"]',
-        commands: [edgeCommand, unobsCommand, rmCommand, nameCommand] 
+      var reverseEdgeCommand =  {
+        content: 'Reverse',
+        select: function(ele) {
+          var source = ele.data('source')
+          var target = ele.data('target')
+          var id = ele.data('id')
+          ele.remove()
+          cy.add({ 'data' : {'source': target, 'target': source}})
+        }
       }
-      var obsMenu = cy.cxtmenu(obsMenuDefaults)
 
-      var unobsMenuDefaults = {
-        selector: 'node[obsType = "unobserved"]',
-        commands: [edgeCommand, obsCommand, rmCommand, nameCommand] 
+      var debugCommand = {
+        content: 'Debug',
+        select: function(e) {
+          console.log(e.data())
+        }
       }
-      var unobsMenu = cy.cxtmenu(unobsMenuDefaults)
+
+      var duplicateCommand = {
+        content: 'Duplicate',
+        select: function(ele) {
+          data = (ele.clone().data())
+          delete data['id']
+          data['inc'] += 1
+          cy.batch(function(){
+            dupe = cy.add({'group': 'nodes', 'data': data})
+            dupeid = dupe.id()
+            var connected = ele.connectedEdges()
+            var children = connected.targets().difference(ele)
+            var parents = connected.sources().difference(ele)
+            children.forEach(function(child) {
+              cy.add({'group': 'edges', 'data': { source: dupeid, target: child.id() }})
+            })
+            parents.forEach(function(parent) {
+              cy.add({'group': 'edges', 'data': { target: dupeid, source: parent.id() }})
+            })
+          })
+        }
+      }
+
+      function subgraph(ele) {
+        graph = cy.filter('node, edge').components().filter(function(c) { return c.contains(ele) } )[0]
+        return graph
+      }
+      function color(ele, color) {
+        ele.data('color', color)
+      }
+
+      function isQuery(ele) {
+        return ele.data('nodeType') == 'query'
+      }
+      function isLatent(ele) {
+        return ele.data('nodeType') == 'latent'
+      }
+      function isEvidence(ele) {
+        return ele.data('nodeType') == 'evidence'
+      }
+      function isColor(ele, color) {
+        return ele.data('color') == color
+      }
+      function visit(ele) {
+        ele.data('visited', true)
+      }
+      function visited(ele) {
+        return ele.data('visited') == true 
+      }
+      function sleepFor( sleepDuration ){
+          var now = new Date().getTime();
+          while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+      }
+
+      function indep(xf, graph) {
+        color(graph, 'black')
+        graph.data('visited', false)
+        function bayesPath(currNode, kind, prevNode) {
+          if(visited(currNode)) return
+          if(prevNode) {
+            visit(prevNode)
+            if(kind == 'parent' && isColor(prevNode, 'yellow')) return false 
+            if(kind == 'child' && isColor(prevNode, 'blue')) return false
+            if(kind == 'parent' && isLatent(currNode)) color(currNode, 'yellow')
+            if(kind == 'child' && isEvidence(currNode)) color(currNode, 'blue')  
+            if(kind == 'parent' && isEvidence(currNode)) color(currNode, 'blue')
+            if(kind == 'child' && isLatent(currNode)) color(currNode, 'yellow') 
+          }
+          var connected = currNode.connectedEdges()
+          var children = connected.targets().difference(currNode)
+          var parents = connected.sources().difference(currNode)
+          children.forEach(function(child) {
+            bayesPath(child, 'child', currNode)
+          })
+          parents.forEach(function(parent) {
+            bayesPath(parent, 'parent', currNode)
+          })
+        }
+        xf.forEach(function(query) {
+          bayesPath(xf, 'base', null)
+        })
+      }
+
+      var splitCommand = {
+        content: 'Split',
+        select: function(ele) {
+          color(cy.filter(), 'black')
+          graph = subgraph(ele)
+          graph.data('color', 'red')
+          xe = graph.filter('node[nodeType="evidence"]')
+          xf = graph.filter('node[nodeType="query"]')
+          xr = graph.difference(xe).difference(xf)
+          /*color(xe,'grey')
+          color(xf,'blue')
+          color(xr,'white')*/
+          indep(ele, graph)
+          condep = graph.filter('node[color="blue"],node[color="yellow"]').filter('node[nodeType!="evidence"]')
+          color(graph, 'black')
+          color(condep, 'orange')
+        }
+      }
+
+
+      var evidenceMenuDefaults = {
+        selector: 'node[nodeType="evidence"]',
+        commands: [edgeCommand, latentCommand, queryCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      }
+      var evidenceMenu = cy.cxtmenu(evidenceMenuDefaults)
+
+      var queryMenuDefaults = {
+        selector: 'node[nodeType="query"]',
+        commands: [edgeCommand, evidenceCommand, latentCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      }
+      var queryMenu = cy.cxtmenu(queryMenuDefaults)
+
+      var latentMenuDefaults = {
+        selector: 'node[nodeType="latent"]',
+        commands: [edgeCommand, queryCommand, evidenceCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      }
+      var latentMenu = cy.cxtmenu(latentMenuDefaults)
 
       var edgeMenuDefaults = {
         selector: 'edge',
-        commands: [rmCommand, nameCommand] 
+        commands: [rmCommand, reverseEdgeCommand, debugCommand] 
       }
       var edgeMenu = cy.cxtmenu(edgeMenuDefaults)
 
       var coreMenuDefaults = {
         selector: 'core',
-        commands: [unobsNodeCommand, obsNodeCommand],
+        commands: [queryNodeCommand, evidenceNodeCommand, latentNodeCommand, layoutCommand],
       }
       var coreMenu = cy.cxtmenu(coreMenuDefaults)
 
@@ -184,10 +354,15 @@
             pom.click();
         }
       }
-        
-      downloadGraph = function() {
+     
+      exportData = function () {
         exportGraph = cy.json()
-        exportString = JSON.stringify(exportGraph)
+        limitedExport = { 'elements': exportGraph['elements'], 'layout': exportGraph['layout'], 'zoom': exportGraph['zoom'], 'pan': exportGraph['pan'] }
+        return JSON.stringify(limitedExport)
+      }
+      
+      downloadGraph = function() {
+        exportString = exportData()
         filename = (!!namer.value.trim()) ? namer.value + '.json' : 'graph.json'
         download(filename, exportString)
         //uriContent = 'data:application/octet-stream,'+encodeURIComponent(exportString)
@@ -211,14 +386,35 @@
       }
 
       window.addEventListener('beforeunload', function(e) {
-        localStorage.setItem('graphCache', JSON.stringify(cy.json()))
+        localStorage.setItem('graphCache', exportData())
       })
 
       cachedGraph = localStorage.getItem('graphCache')
       if(cachedGraph){
         console.log("Loaded cached graph")
-        console.log(cachedGraph)
+        console.log(JSON.parse(cachedGraph))
         cy.json(JSON.parse(cachedGraph))
       }
+
+      var jaxDefaults = {
+        "svg": true,
+        "inline": false,
+        "format": "TeX",
+        "width": 100,
+        "ex": 6,
+        "linebreaks": true,
+      }
+
+      cy.filter('node[!nodeType]').data('nodeType', 'latent')
+      cy.filter('node[!color]').data('color', 'black')
+      cy.filter('node[!inc]').data('inc', 0)
+      /*getMath = function(latexStr) {
+        options = copy(jaxDefaults)
+        options.math = latexStr
+        mathjax.typeset(opts, function(data) {
+          return data.svg
+        })
+      }*/
+
     </script>
 </body>
