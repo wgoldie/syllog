@@ -48,48 +48,53 @@
     <button type="button" id="export">Export</button>
     <input type="file" id="import">
     <script>
-      defaultStyle = [
-        {
-          selector: 'node',
-          style: {
-            shape: 'ellipse',
-            'border-width':'2',
-            'background-color': 'white',
-            label: function(ele) { return ele.data('name')+'_'+(ele.data('inc')|' ') }
-          }
-        },
-        {
-          selector: 'node[color]',
-          style: {'border-color':'data(color)'}
-        },
-        {
-          selector: 'node[nodeType="evidence"]',
-          style: {'background-color': 'grey'}
-        },
-        {
-          selector: 'node[nodeType="latent"]',
-          style: {'background-color': 'white'}
-        },
-        {
-          selector: 'node[nodeType="query"]',
-          style: {'background-color': 'blue'}
-        },
-        {
-          selector: 'edge',
-          style: { 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'grey' }
-        }
-      ]
-
-      style = defaultStyle
       var cy = cytoscape({
         container: document.getElementById('cy'),
-        style: style, 
         layout: {
           name: 'dagre',
         },
       });
 
+      function setStyle(isDirected) {
+        var style = [
+          {
+            selector: 'node',
+            style: {
+              shape: 'ellipse',
+              'border-width':'2',
+              'background-color': 'white',
+              'label': function(ele) {
+                return ele.data('name')+'_'+(ele.data('inc')|' ')
+              }
+            }
+          },
+          {
+            selector: 'node[color]',
+            style: {'border-color':'data(color)'}
+          },
+          {
+            selector: 'node[nodeType="evidence"]',
+            style: {'background-color': 'grey'}
+          },
+          {
+            selector: 'node[nodeType="latent"]',
+            style: {'background-color': 'white'}
+          },
+          {
+            selector: 'node[nodeType="query"]',
+            style: {'background-color': 'blue'}
+          },
+          {
+            selector: 'edge',
+            style: (isDirected ?
+            { 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'grey' }
+            : {'target-arrow-shape':'none'})
+          }
+        ]
+        cy.json({'style': style})
+      }
 
+      setStyle(true)
       var latentCommand = {
         content: 'Latent', 
         select: function(ele) {
@@ -136,15 +141,11 @@
         return variableNames[variableNameIndex % 26]
       }
 
-      prepareLabel = function(labelText) {
-
-      }
-
       var evidenceNodeCommand = {
         content: 'Observed Node',
         select: function(ele, ev) {
           var nodeName = getVariableName() 
-          prepareLabel(nodeName)
+          //prepareLabel(nodeName)
           cy.add({ data: { 'name': nodeName, 'inc': 0, 'nodeType': 'evidence' }, position: ev.position })
         }
       }
@@ -153,24 +154,67 @@
         content: 'Query Node',
         select: function(ele, ev) {
           var nodeName = getVariableName() 
-          prepareLabel(nodeName)
+          //prepareLabel(nodeName)
           cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'query' }, position: ev.position })
         }
       }
 
       var latentNodeCommand = {
-        content: 'Query Node',
+        content: 'Latent Node',
         select: function(ele, ev) {
           var nodeName = getVariableName() 
-          prepareLabel(nodeName)
-          cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'query' }, position: ev.position })
+          //prepareLabel(nodeName)
+          cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'latent' }, position: ev.position })
         }
       }
 
       var layoutCommand = {
         content: 'Layout',
         select: function() {
-          cy.layout({ name: 'dagre' }).run()
+          cy.layout({ name: isDirected ? 'dagre' : 'grid' , cols: 5, sort: function(a,b) { return a.data('inc') - b.data('inc') } }).run()
+        }
+      }
+
+      var tikzCommand = {
+        content: 'Tikz',
+        select: function() {
+          nodes = cy.filter('node[nodeType]')
+          edges = nodes.connectedEdges()
+          lines = ""
+          xpos = nodes.map(function(node,i) { return [node.position('x'), node] })
+          xsorted = xpos.sort(function(a,b) { return a[0]-b[0]}).map(function(pos) { return pos[0] }) 
+          xmin = xsorted[0]
+          xmax = xsorted[xsorted.length-1]
+          ypos = nodes.map(function(node,i) { return [node.position('y'), node] })
+          ysorted = ypos.sort(function(a,b) { return a[0]-b[0]}).map(function(pos) { return pos[0] })
+          ymin = ysorted[0]
+          ymax = ysorted[ysorted.length-1]
+          var last = null
+          //lines += '\\begin{tikzpicture}[scale=' + (10/Math.max(xsorted[xsorted.length-1],xsorted[xsorted.length-1])).toFixed(2) + ']\n'  
+          //lines += '\\begin{tikzpicture}[scale=10]\n'  
+          lines += '%%tikz -l bayesnet\n'  
+          nodes.forEach(function(node) {
+            type = node.data('nodeType') == 'evidence' ? 'obs' : 'latent'
+            id = node.id().replace('-','')
+            xidx = xsorted.indexOf(node.position('x'))
+            right = xidx > 0 ? xsorted[xidx-1] : null 
+            yidx = ysorted.indexOf(node.position('y'))
+            below = yidx > 0 ? xsorted[yidx-1] : null 
+            x = xsorted[xidx] - xmin
+            y = ysorted[yidx] - ymin
+            //lines += 'node['+type+(below? ', below=of '+below:'')+(right? ', right=of '+right:'')+'] ('+id+') {$'+(node.data('name')||'')+'_'+(node.data('inc')||'0')+'$} ;\n'
+            lines += '\\node['+type+'] ('+id+') at ('+(5*x/xmax).toFixed(2)+', '+ (-5*y/ymax).toFixed(2) +') {$'+(node.data('name')||'')+'_'+(node.data('inc')||'0')+'$} ;\n'
+            last = id
+          })
+          edges.forEach(function(edge) {
+            director = isDirected ? '' : '[-]'
+            sourceid = edge.data('source').replace('-','')
+            targetid = edge.data('target').replace('-','')
+            lines += '\\edge'+director+' {'+sourceid+'} {'+targetid+'} ;\n'
+          })
+          //#lines += '\\end{tikzpicture}'
+          console.log(lines)
+          
         }
       }
 
@@ -254,7 +298,7 @@
           while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
       }
 
-      function indep(xf, graph) {
+      function dindep(xf, graph) {
         color(graph, 'black')
         graph.data('visited', false)
         function bayesPath(currNode, kind, prevNode) {
@@ -284,7 +328,7 @@
       }
 
       var splitCommand = {
-        content: 'Split',
+        content: 'Bayes Balls',
         select: function(ele) {
           color(cy.filter(), 'black')
           graph = subgraph(ele)
@@ -295,44 +339,96 @@
           /*color(xe,'grey')
           color(xf,'blue')
           color(xr,'white')*/
-          indep(ele, graph)
+          dindep(ele, graph)
           condep = graph.filter('node[color="blue"],node[color="yellow"]').filter('node[nodeType!="evidence"]')
           color(graph, 'black')
           color(condep, 'orange')
         }
       }
 
-
-      var evidenceMenuDefaults = {
-        selector: 'node[nodeType="evidence"]',
-        commands: [edgeCommand, latentCommand, queryCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      var markovBlanketCommand = {
+        content: 'Markov Blanket',
+        select: function(ele) {
+          graph = subgraph(ele)
+          color(graph, 'black')
+          clique = ele.connectedEdges().connectedNodes()
+          mb = clique.difference(ele)
+          color(mb, 'red')
+          color(ele, 'green')
+        }
       }
-      var evidenceMenu = cy.cxtmenu(evidenceMenuDefaults)
-
-      var queryMenuDefaults = {
-        selector: 'node[nodeType="query"]',
-        commands: [edgeCommand, evidenceCommand, latentCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      
+      var modeSwitchCommand = function(mode) {
+        return {
+          content: mode + ' Mode',
+          select: function() {
+            contextMenus(mode)
+          }
+        }
       }
-      var queryMenu = cy.cxtmenu(queryMenuDefaults)
+      
+      var isDirected = false;
 
-      var latentMenuDefaults = {
-        selector: 'node[nodeType="latent"]',
-        commands: [edgeCommand, queryCommand, evidenceCommand, rmCommand, nameCommand, duplicateCommand, debugCommand, splitCommand] 
+      var directedSwitchCommand = function(isDirected) {
+        return {
+          content: isDirected ? 'Undirected' : 'Directed',
+          select: function() {
+            setStyle(!isDirected)
+            contextMenus(null, !isDirected)
+          }
+        }
       }
-      var latentMenu = cy.cxtmenu(latentMenuDefaults)
 
-      var edgeMenuDefaults = {
-        selector: 'edge',
-        commands: [rmCommand, reverseEdgeCommand, debugCommand] 
+      var nodeBaseCommands = [debugCommand]
+      var menus = []
+
+      function contextMenus(_mode, _isDirected) { 
+        menus.forEach(function(menu) { menu.destroy() }) 
+        mode = _mode || mode 
+        isDirected = !(_isDirected == null) ? _isDirected: isDirected 
+        var coreBaseCommands = [layoutCommand, directedSwitchCommand(isDirected), tikzCommand]
+        var nodeCommands = []
+        var coreCommands = []
+        if(mode == 'edit') { 
+          nodeCommands = nodeBaseCommands.concat([edgeCommand, rmCommand, nameCommand, duplicateCommand])
+          evidenceCommands = nodeCommands
+          queryCommands = nodeCommands
+          latentCommands = nodeCommands
+          coreCommands = coreBaseCommands.concat([queryNodeCommand, evidenceNodeCommand, latentNodeCommand, modeSwitchCommand('analyze')])
+        }       
+        if(mode == 'analyze') {
+          nodeCommands = nodeBaseCommands.concat([isDirected ? splitCommand : markovBlanketCommand])
+          evidenceCommands = nodeCommands.concat([queryCommand, latentCommand]) 
+          queryCommands = nodeCommands.concat([evidenceCommand, latentCommand]) 
+          latentCommands = nodeCommands.concat([queryCommand, evidenceCommand]) 
+          nodeCommands.concat([queryCommand, latentCommand]) 
+          coreCommands = coreBaseCommands.concat([modeSwitchCommand('edit')])
+        }
+        
+        menus = [
+          cy.cxtmenu({
+            selector: 'node[nodeType="evidence"]',
+            commands: evidenceCommands       
+          }),
+          cy.cxtmenu({
+            selector: 'node[nodeType="query"]',
+            commands: queryCommands
+          }),
+          cy.cxtmenu({
+            selector: 'node[nodeType="latent"]',
+            commands: latentCommands
+          }),
+          cy.cxtmenu({
+            selector: 'edge',
+            commands: [rmCommand, reverseEdgeCommand, debugCommand] 
+          }),
+          cy.cxtmenu({
+            selector: 'core',
+            commands: coreCommands 
+          })
+        ]
       }
-      var edgeMenu = cy.cxtmenu(edgeMenuDefaults)
-
-      var coreMenuDefaults = {
-        selector: 'core',
-        commands: [queryNodeCommand, evidenceNodeCommand, latentNodeCommand, layoutCommand],
-      }
-      var coreMenu = cy.cxtmenu(coreMenuDefaults)
-
+      contextMenus('edit')
       document.onkeyup = function(e) {
         var c = String.fromCharCode(e.which);
         if (c.toLowerCase() === 'l') {
@@ -395,6 +491,7 @@
         console.log(JSON.parse(cachedGraph))
         cy.json(JSON.parse(cachedGraph))
       }
+      setStyle(isDirected)
 
       var jaxDefaults = {
         "svg": true,
