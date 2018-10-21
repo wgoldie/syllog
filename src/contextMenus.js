@@ -1,4 +1,3 @@
-import buildGraphCommands from './graphcommands';
 import { EDITOR_MODES } from './constants';
 
 /*
@@ -15,8 +14,13 @@ function buildCommandLists(cy, commands, mode) {
   
   const {
     queryNodeCommand,
+    latentNodeCommand,
+    evidenceNodeCommand,
     edgeCommand,
-    rmCommand
+    rmCommand,
+    setLatentCommand,
+    setEvidenceCommand,
+    setQueryCommand,
   } = commands; 
 
   switch (mode) {
@@ -25,10 +29,15 @@ function buildCommandLists(cy, commands, mode) {
         'node': [
           edgeCommand,
           rmCommand,
+          setLatentCommand,
+          setEvidenceCommand,
+          setQueryCommand,
         ],
         'core': [
           ...coreBase,
           queryNodeCommand,
+          latentNodeCommand,
+          evidenceNodeCommand,
         ],
       }
     default:

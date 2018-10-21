@@ -12,7 +12,7 @@ cytoscape.use(cxtmenu);
 cytoscape.use(dagre);
 cytoscape.use(edgehandles);
 
-import { getStyle } from './graphstyle';
+import { getStyle } from './graphStyle';
 import { EDITOR_MODES } from './constants';
 import { contextMenuReducer } from './contextMenus'
 
@@ -33,7 +33,7 @@ cy.json({
   //'elements': [{ group: 'nodes', data: {id: 0}}]
 })
 
-var commands = {...buildGraphCommands(cy)};
+var commands = {...buildGraphCommands(cy), ...buildNodeTypeCommands(cy) };
 var menus = contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
 
 /*

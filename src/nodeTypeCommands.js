@@ -1,28 +1,18 @@
 export default function buildNodeTypeCommands(cy) {
-  export const latentCommand = {
-    content: 'Latent', 
+  /*
+   * Set a node to a specific type
+   * for PGM analysis
+   */
+  const setNodeTypeCommand = (type) => ({
+    content: `Set to ${type}`, 
     select: function(ele) {
-      ele.data('nodeType', 'latent')
+      ele.data('nodeType', type)
     },
-  } 
-
-  export const queryCommand = {
-    content: 'Query', 
-    select: function(ele) { 
-      ele.data('nodeType', 'query')
-    },
-  } 
-
-  export const evidenceCommand = {
-    content: 'Evidence',
-    select: function(ele) {
-      ele.data('nodeType', 'evidence')
-    },
-  } 
+  }); 
 
   return {
-    latentCommand,
-    queryCommand,
-    evidenceCommand
+    setLatentCommand: setNodeTypeCommand('latent'),
+    setQueryCommand: setNodeTypeCommand('query'),
+    setEvidenceCommand: setNodeTypeCommand('evidence'),
   }; 
 }
