@@ -1,0 +1,34 @@
+{
+  "name": "syllog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wgoldie/syllog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wgoldie/syllog/issues"
+  },
+  "homepage": "https://github.com/wgoldie/syllog#readme",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "webpack": "^4.21.0",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "cytoscape": "^3.2.18",
+    "cytoscape-cxtmenu": "^3.0.1",
+    "cytoscape-dagre": "^2.2.2",
+    "cytoscape-edgehandles": "^3.4.1",
+    "dagre": "^0.8.2"
+  }
+}
