@@ -21,6 +21,7 @@ function buildCommandLists(cy, commands, mode) {
     setLatentCommand,
     setEvidenceCommand,
     setQueryCommand,
+    exportJSONCommand,
   } = commands; 
 
   switch (mode) {
@@ -38,6 +39,7 @@ function buildCommandLists(cy, commands, mode) {
           queryNodeCommand,
           latentNodeCommand,
           evidenceNodeCommand,
+          exportJSONCommand,
         ],
       }
     default:

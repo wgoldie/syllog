@@ -18,6 +18,7 @@ import { contextMenuReducer } from './contextMenus'
 
 import buildGraphCommands from './graphCommands';
 import buildNodeTypeCommands from './nodeTypeCommands';
+import buildProcessCommands from './processCommands';
 
 // Init cytoscape graph library
 const cy = cytoscape({
@@ -33,7 +34,12 @@ cy.json({
   //'elements': [{ group: 'nodes', data: {id: 0}}]
 })
 
-var commands = {...buildGraphCommands(cy), ...buildNodeTypeCommands(cy) };
+var commands = {
+  ...buildGraphCommands(cy),
+  ...buildNodeTypeCommands(cy),
+  ...buildProcessCommands(cy)
+};
+
 var menus = contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
 
 /*

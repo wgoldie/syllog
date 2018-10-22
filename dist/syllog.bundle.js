@@ -55878,13 +55878,14 @@ function buildCommandLists(cy, commands, mode) {
       rmCommand = commands.rmCommand,
       setLatentCommand = commands.setLatentCommand,
       setEvidenceCommand = commands.setEvidenceCommand,
-      setQueryCommand = commands.setQueryCommand;
+      setQueryCommand = commands.setQueryCommand,
+      exportJSONCommand = commands.exportJSONCommand;
 
   switch (mode) {
     case _constants__WEBPACK_IMPORTED_MODULE_0__["EDITOR_MODES"].EDIT:
       return {
         'node': [edgeCommand, rmCommand, setLatentCommand, setEvidenceCommand, setQueryCommand],
-        'core': coreBase.concat([queryNodeCommand, latentNodeCommand, evidenceNodeCommand])
+        'core': coreBase.concat([queryNodeCommand, latentNodeCommand, evidenceNodeCommand, exportJSONCommand])
       };
 
     default:
@@ -56091,6 +56092,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contextMenus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./contextMenus */ "./src/contextMenus.js");
 /* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
 /* harmony import */ var _nodeTypeCommands__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./nodeTypeCommands */ "./src/nodeTypeCommands.js");
+/* harmony import */ var _processCommands__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./processCommands */ "./src/processCommands.js");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56110,6 +56112,7 @@ cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_edgehandles__WEBP
 
 
 
+
  // Init cytoscape graph library
 
 var cy = cytoscape__WEBPACK_IMPORTED_MODULE_0___default()({
@@ -56124,7 +56127,7 @@ cy.json({
 
 });
 
-var commands = _objectSpread({}, Object(_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"])(cy), Object(_nodeTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"])(cy));
+var commands = _objectSpread({}, Object(_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"])(cy), Object(_nodeTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"])(cy), Object(_processCommands__WEBPACK_IMPORTED_MODULE_10__["default"])(cy));
 
 var menus = Object(_contextMenus__WEBPACK_IMPORTED_MODULE_7__["contextMenuReducer"])(cy, commands, [], _constants__WEBPACK_IMPORTED_MODULE_6__["EDITOR_MODES"].EDIT);
 /*
@@ -56195,6 +56198,45 @@ function buildNodeTypeCommands(cy) {
     setEvidenceCommand: setNodeTypeCommand('evidence')
   };
 }
+
+/***/ }),
+
+/***/ "./src/processCommands.js":
+/*!********************************!*\
+  !*** ./src/processCommands.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildProcessCommands; });
+function buildProcessCommands(cy) {
+  var exportJSONCommand = {
+    content: 'Export Graph JSON',
+    select: function select() {
+      // Todo: validity check for unique names, DAG (for now)
+      var nodes = cy.nodes().map(function (node) {
+        return {
+          name: node.data().name,
+          type: node.data().type
+        };
+      });
+      var edges = cy.edges().map(function (edge) {
+        return [edge.source().data().name, edge.target().data().name];
+      });
+      var json = JSON.stringify({
+        nodes: nodes,
+        edges: edges
+      });
+      console.log(json);
+    }
+  };
+  return {
+    exportJSONCommand: exportJSONCommand
+  };
+}
+;
 
 /***/ })
 
