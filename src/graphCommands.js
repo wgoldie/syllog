@@ -56,9 +56,9 @@ export default function buildGraphCommands(cy, getVariableName) {
     }
 
     // Remove other inputs to the target node
-    if (target.indegree() != 1) {
-      target.incomers().filter('edge').filter(edge => edge.data().source !== source.id()).remove();
-    }
+    //if (target.indegree() != 1) {
+    //  target.incomers().filter('edge').filter(edge => edge.data().source !== source.id()).remove();
+    //}
     /*
     if (
       source.data().type === NODE_TYPES.FACTOR 

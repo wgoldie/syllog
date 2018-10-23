@@ -3,6 +3,9 @@ import torch
 from igraph import Graph
 #from graph_tool.topology import is_DAG, topological_sort 
 
+LATENT = 'LATENT'
+EVIDENCE = 'EVIDENCE'
+QUERY = 'QUERY'
 FACTOR = 'FACTOR'
 VARIABLE = 'VARIABLE'
 FACTOR_INPUT = 'FACTOR_INPUT'
@@ -15,88 +18,119 @@ class SyllogPyroModel(object):
     A Syllog-generated model for Pyro
     
     """
-    def __init__(self, nodes, target=None):
+    def __init__(self, graph):
         """
         Arguments:
-
-        nodes: an ordered dictionary-like object { name: { type, ?variableType } }
-        target: a string identifying a node to target calculation of
+            graph - an igraph model with the following vertex attributes:
+                node_type: string in informal enum [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]
+                variable_type: string in informal enum [LATENT, EVIDENCE, QUERY], 
+                 should be null if node_type is not VARIABLE
+            The graph must also have the following properties:
+                - All nodes must have unique names
+                - Each variable node have exactly one parent, which is a factor output
+                - Each factor input node must have exactly one parent, which is a variable node; 
+                and exactly one child, which is a factor node
+                - Each factor output node must have exactly one parent, which is a factor node; 
+                and may have zero or more children, each of which are a variable nodes
         """
-
-        variable_names = ([key for (key, value) in nodes.items() if value['type'] == 'variable'])
-        if target is not None and target not in variable_names:
-            raise Exception('Invalid target')
-        self.target = target or variable_names[-1]
-        factors = {name:node for name, node in nodes.items() if node['type'] == 'factor'}
-        factor_outputs = [output for node in factors.values() for output in node['outputs']]
-     
-        # validate input
-        if len(factor_outputs) != len(set(factor_outputs)):
-            raise Exception("Factors may not share outputs; Nodes may only result from one factor")
-        for name, node in nodes.items():
-            if node.get('type', None) not in ['factor', 'variable']:
-                raise Exception("All nodes must have type of factor or variable.")
-            if node['type'] == 'factor':
-                outputs = node.get('outputs', None)
-                if outputs is None or not set(outputs).issubset(set(variable_names)):
-                    raise Exception("All factor nodes must have an output set of variables")
-            if node['type'] == 'variable':
-                if node.get('variableType', None).lower() not in ['latent', 'evidence', 'query']:
-                    raise Exception("All variable nodes must have type of latent, evidence, or query.")
-                if name not in factor_outputs:
-                    raise Exception("All variable nodes must result from a factor execution.")
-        vertex_attrs = {
-            'name': list(nodes.keys()),
-        }
-
-        if len(set(vertex_attrs['name'])) != len(vertex_attrs['name']):
-            raise Exception("Graph is invalid: multiple nodes with the same name.")
-
-        # use igraph to get a topological sorting of the graph
-        graph = Graph(
-            n=len(nodes),
-            vertex_attrs=vertex_attrs,
-            directed=True
-        )
-
-        for factor_name, node in factors.items():
-            graph.add_edges(
-                [(variable_name, factor_name) for variable_name in node['inputs']])
-            graph.add_edges(
-                [(factor_name, variable_name) for variable_name in node['outputs']])
-
-        if not graph.is_dag():
-            raise Exception("Only DAGs currently supported")
-
+        
+        # TODO enforce rules
+        
         sort_idx = graph.topological_sorting()
+        self.graph = graph
         self.sort = graph.vs[sort_idx]['name']
-        self.nodes = nodes
-        self.factors = factors
         
     @classmethod 
-    def from_cyjson(cls, graph_cyjson):
+    def from_cyjson(cls, cyjson_str):
         """
         Arguments:
-        graph_cyjson
+            cyjson_str - a JSON string output by Cytoscape.JS.
+            The described graph must follow the requirements of __init__.
 
         Returns:
-        An instance of SyllogPyroModel
+            An instance of SyllogPyroModel
 
         """
-        graph = json.loads(graph_cyjson)
-        variable_nodes = [node for node in graph['nodes'] if node['type'] == VARIABLE]
+        cyjson = json.loads(cyjson_str)
+        nodes = [node['data'] for node in cyjson['nodes']]
+        factors = [node['id'] 
+                   for node in nodes 
+                   if node['type'] == FACTOR]
+        factor_input_edges = [(node['id'], node['factor']) 
+                              for node in nodes 
+                              if node['type'] == FACTOR_INPUT]
+        factor_output_edges = [(node['factor'], node['id']) 
+                               for node in nodes 
+                               if node['type'] == FACTOR_OUTPUT]
+        graph = Graph(0, directed=True)
+        
+        for node in nodes:
+            if node['type'] in [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]:
+                graph.add_vertex(
+                    name=node['id'], 
+                    node_type=node['type'], 
+                    variable_type=node.get('variableType', None)
+                )
+                
+        graph.add_edges([(edge['data']['source'], edge['data']['target']) 
+                         for edge in cyjson['edges']])
+        graph.add_edges(factor_input_edges)
+        graph.add_edges(factor_output_edges)
+        return cls(graph)
+    
+    """
+    shape_dict = {
+        FACTOR: 'rectangle',
+        VARIABLE: 'circle',
+        FACTOR_INPUT: 'triangle',
+        FACTOR_OUTPUT: 'triangle'
+    }
 
-        return cls(graph, None)
-
+    color_dict = {
+        LATENT: 'blue',
+        EVIDENCE: 'black',
+        QUERY: 'green'
+    }
+    """
+    
+    def plot_graph(self, filename):
+        """
+        Plots the compute graph to a file.
+        Arguments: 
+            - Filename: a .png filename valid for writing
+        """
+        ## todo check writable and .png, use dagre layout algorithm?
+        self.graph.vs['label'] = graph.vs['name']
+        self.graph.vs['shape'] = [SyllogPyroModel.shape_dict[node_type] 
+                                  for node_type in graph.vs['node_type']]
+        self.graph.vs['color'] = [SyllogPyroModel.color_dict.get(variable_type, 'white') 
+                                  for variable_type in graph.vs['variable_type']]
+        layout = self.graph.layout("kk")
+        plot(self.graph, filename, layout=layout)
+    
     def get_factor_descriptions(self):
         """
         Returns:
-
-        factor_descriptions: a dict-like object that specifies the dependencies of each node.
+            factor_descriptions: a dict-like object that specifies 
+            the inputs and outputs of each factor node.
         """
+        
+        factor_vertices = {v['name']: v for v in self.graph.vs if v['node_type'] == FACTOR}
+        factor_inputs = {
+            fn: [p['name'] for p in fv.predecessors()]
+            for (fn, fv) in factor_vertices.items()
+        }
+        factor_outputs = {
+            fn: [s['name'] for s in fv.successors()]
+            for (fn, fv) in factor_vertices.items()
+        }
+        
         factor_descriptions = {
-            name: { 'inputs': node['inputs'], 'outputs': node['outputs'] } 
-            for (name, node) in self.factors.items()
+            factor_name: {
+                'inputs': factor_inputs.get(factor_name, []),
+                'outputs': factor_outputs.get(factor_name, [])
+            }
+            for factor_name in factor_vertices.keys()
         }
 
         return factor_descriptions
@@ -108,25 +142,36 @@ class SyllogPyroModel(object):
         factors: a dict-like object of sampling functions for each factor
         each of which receives the values of the factor's parent variables (if any exist)
         as kwargs keyed on the parents' names
+        
+        Returns: A dict-like object of all node values
         """
 
         node_values = {}
+        factor_descriptions = self.get_factor_descriptions()
 
+        # iterate through the topological sorting of the graph
         for name in self.sort:
-            node = self.nodes[name]
-            if node['type'] == 'factor':
+            node = self.graph.vs.select(name_eq=name)[0]
+            
+            # if we are at a factor, execute it on the inputs
+            if node['node_type'] == FACTOR:
                 factor_args = {
                     input_name: node_values[input_name]
-                    for input_name in node['inputs'] 
+                    for input_name in factor_descriptions[name]['inputs'] 
                 }
 
-                factor_value = factor_fns[name](*factor_args.values())
+                factor_outputs = factor_fns[name](**factor_args)
 
-                for output_name in node['outputs']:
-                    node_values[output_name] = factor_value
+                for output in node.successors():
+                    output_name = output['name']
+                    node_values[output_name] = factor_outputs[output_name]
+            else:
+                # if we are not at a factor, we must have a parent value already computed
+                # by the topological sort and the required graph properties
+                if not node_values.get(name, None):
+                    # TODO: define value reduction behavior (by stacking, etc)
+                    # if multiple parent nodes exist w/o intermediary factor
+                    node_values[name] = node_values[node.predecessors()[0]['name']]
+                    
 
-                if self.target in node['outputs']:
-                    # exit early if the rest of the graph is irrelevant
-                    return node_values[self.target]
-
-        return node_values[self.target]
+        return node_values
