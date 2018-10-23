@@ -56187,7 +56187,7 @@ function buildGraphCommands(cy, getVariableName) {
           type = _ele$data2.type;
 
       if (type !== _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) return;
-      cy.add(factorInputForFactor(getVariableName(), ele));
+      cy.add(factorOutputForFactor(getVariableName(), ele));
     }
   };
   return {
@@ -56271,13 +56271,10 @@ function buildGraphCommands(cy, getVariableName) {
       cy.remove(added);
       return;
     } // Remove other inputs to the target node
+    //if (target.indegree() != 1) {
+    //  target.incomers().filter('edge').filter(edge => edge.data().source !== source.id()).remove();
+    //}
 
-
-    if (target.indegree() != 1) {
-      target.incomers().filter('edge').filter(function (edge) {
-        return edge.data().source !== source.id();
-      }).remove();
-    }
     /*
     if (
       source.data().type === NODE_TYPES.FACTOR 

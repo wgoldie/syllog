@@ -1,5 +1,7 @@
 ## Syllog
 
+![](icecream.png)
+
 An interface and library for visual probabilistic programming.
 Currently being converted from an early prototype to beta architecture.
 

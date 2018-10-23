@@ -98,7 +98,7 @@ export default function buildGraphCommands(cy, getVariableName) {
       const { id, type } = ele.data();
       if (type !== NODE_TYPES.FACTOR) return;
 
-      cy.add(factorInputForFactor(getVariableName(), ele));
+      cy.add(factorOutputForFactor(getVariableName(), ele));
     }
   });
 
