@@ -20,12 +20,14 @@ function buildCommandLists(cy, commands, mode) {
     setQueryCommand,
     exportJSONCommand,
     importJSONCommand,
-    layoutCommand
+    layoutCommand,
+    renameNodeCommand,
   } = commands; 
  
   var nodeBase = [
     edgeCommand,
     rmCommand,
+    renameNodeCommand,
   ];
 
   switch (mode) {

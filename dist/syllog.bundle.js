@@ -56019,8 +56019,9 @@ function buildCommandLists(cy, commands, mode) {
       setQueryCommand = commands.setQueryCommand,
       exportJSONCommand = commands.exportJSONCommand,
       importJSONCommand = commands.importJSONCommand,
-      layoutCommand = commands.layoutCommand;
-  var nodeBase = [edgeCommand, rmCommand];
+      layoutCommand = commands.layoutCommand,
+      renameNodeCommand = commands.renameNodeCommand;
+  var nodeBase = [edgeCommand, rmCommand, renameNodeCommand];
 
   switch (mode) {
     case _constants__WEBPACK_IMPORTED_MODULE_0__["EDITOR_MODES"].EDIT:
@@ -56442,6 +56443,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _processCommands__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./processCommands */ "./src/processCommands.js");
 /* harmony import */ var _layoutCommands__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layoutCommands */ "./src/layoutCommands.js");
 /* harmony import */ var _factorCommands__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./factorCommands */ "./src/factorCommands.js");
+/* harmony import */ var _variableNameCommands__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./variableNameCommands */ "./src/variableNameCommands.js");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56457,6 +56459,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_cxtmenu__WEBPACK_IMPORTED_MODULE_2___default.a);
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_dagre__WEBPACK_IMPORTED_MODULE_3___default.a);
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_edgehandles__WEBPACK_IMPORTED_MODULE_4___default.a);
+
 
 
 
@@ -56492,7 +56495,7 @@ var getVariableName = function getVariableName() {
   return name;
 };
 
-var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"], _factorCommands__WEBPACK_IMPORTED_MODULE_12__["default"]];
+var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"], _factorCommands__WEBPACK_IMPORTED_MODULE_12__["default"], _variableNameCommands__WEBPACK_IMPORTED_MODULE_13__["default"]];
 var commands = builders.reduce(function (acc, builder) {
   return _objectSpread({}, builder(cy, getVariableName), acc);
 }, {});
@@ -56713,6 +56716,69 @@ var arrayToObject = function arrayToObject(arr) {
     return _objectSpread({}, acc, _defineProperty({}, k, v));
   }, {});
 };
+
+/***/ }),
+
+/***/ "./src/variableNameCommands.js":
+/*!*************************************!*\
+  !*** ./src/variableNameCommands.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildVariableNameCommands; });
+/* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+function buildVariableNameCommands(cy) {
+  var renameNodeCommand = {
+    content: 'Rename',
+    select: function select(ele) {
+      var rename = window.prompt("Rename ".concat(ele.id(), " to:"), ele.id());
+
+      if (rename) {
+        if (cy.getElementById(rename).length > 0) {
+          console.log("Name already in use.");
+          return;
+        }
+
+        var _ele$data = ele.data(),
+            id = _ele$data.id,
+            data = _objectWithoutProperties(_ele$data, ["id"]);
+
+        var newNode = cy.add({
+          group: 'nodes',
+          data: _objectSpread({}, data, {
+            id: rename
+          }),
+          position: ele.position()
+        });
+        cy.add(ele.incomers().filter('node').map(function (incomer) {
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_0__["getEdgeCyJSON"])(incomer.id(), rename);
+        }));
+        cy.add(ele.outgoers().filter('node').map(function (outgoer) {
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_0__["getEdgeCyJSON"])(rename, outgoer.id());
+        }));
+        ele.children().forEach(function (child) {
+          return child.data('parent', rename);
+        });
+        ele.remove();
+      }
+    }
+  };
+  return {
+    renameNodeCommand: renameNodeCommand
+  };
+}
 
 /***/ }),
 

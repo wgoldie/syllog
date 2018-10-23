@@ -21,6 +21,7 @@ import buildVariableTypeCommands from './variableTypeCommands';
 import buildProcessCommands from './processCommands';
 import buildLayoutCommands from './layoutCommands';
 import buildFactorCommands from './factorCommands';
+import buildVariableNameCommands from './variableNameCommands';
 
 // Init cytoscape graph library
 const cy = cytoscape({
@@ -54,7 +55,8 @@ const builders = [
   buildVariableTypeCommands,
   buildProcessCommands,
   buildLayoutCommands,
-  buildFactorCommands
+  buildFactorCommands,
+  buildVariableNameCommands
 ];
 
 const commands = builders.reduce((acc, builder) => ({ ...builder(cy, getVariableName), ...acc }), {})
