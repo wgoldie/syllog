@@ -56091,9 +56091,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeFactor", function() { return makeFactor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildGraphCommands; });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+/* harmony import */ var uuid_v4__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+/* harmony import */ var uuid_v4__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(uuid_v4__WEBPACK_IMPORTED_MODULE_1__);
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 var getFactorCyJSON = function getFactorCyJSON(id) {
@@ -56107,43 +56110,53 @@ var getFactorCyJSON = function getFactorCyJSON(id) {
 var getFactorContainersCyJSON = function getFactorContainersCyJSON(id) {
   return [{
     data: {
-      id: "".concat(id, "__inputs"),
+      id: uuid_v4__WEBPACK_IMPORTED_MODULE_1___default()(),
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT_CONTAINER,
       parent: id
     }
   }, {
     data: {
-      id: "".concat(id, "__outputs"),
+      id: uuid_v4__WEBPACK_IMPORTED_MODULE_1___default()(),
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT_CONTAINER,
       parent: id
     }
   }];
 };
-var getFactorInputCyJSON = function getFactorInputCyJSON(id, parentFactorId) {
+var getFactorInputCyJSON = function getFactorInputCyJSON(id, parentId, factorId) {
   return {
     data: {
       id: id,
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT,
-      parent: "".concat(parentFactorId, "__inputs")
+      parent: parentId,
+      factor: factorId
     }
   };
 };
-var getFactorOutputCyJSON = function getFactorOutputCyJSON(id, parentFactorId) {
+var getFactorOutputCyJSON = function getFactorOutputCyJSON(id, parentId, factorId) {
   return {
     data: {
       id: id,
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT,
-      parent: "".concat(parentFactorId, "__outputs")
+      parent: parentId,
+      factor: factorId
     }
   };
 };
+
+var factorInputForFactor = function factorInputForFactor(name, factorEle) {
+  return getFactorInputCyJSON(name, factorEle.children("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT_CONTAINER, "\"]")).first().id(), factorEle.id());
+};
+
+var factorOutputForFactor = function factorOutputForFactor(name, factorEle) {
+  return getFactorOutputCyJSON(name, factorEle.children("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT_CONTAINER, "\"]")).first().id(), factorEle.id());
+};
+
 function makeFactor(cy, getVariableName, position) {
   var factor = cy.add(_objectSpread({}, getFactorCyJSON(getVariableName()), {
     position: position
   }));
   var containers = cy.add(getFactorContainersCyJSON(factor.id()));
-  var output = cy.add(_objectSpread({}, getFactorOutputCyJSON(getVariableName(), factor.id())));
-  return [factor, output];
+  cy.add(factorOutputForFactor(getVariableName(), factor));
 }
 function buildGraphCommands(cy, getVariableName) {
   /*
@@ -56163,7 +56176,7 @@ function buildGraphCommands(cy, getVariableName) {
           type = _ele$data.type;
 
       if (type !== _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) return;
-      cy.add(getFactorInputCyJSON(getVariableName(), id));
+      cy.add(factorInputForFactor(getVariableName(), ele));
     }
   };
   var addOutputCommand = {
@@ -56174,7 +56187,7 @@ function buildGraphCommands(cy, getVariableName) {
           type = _ele$data2.type;
 
       if (type !== _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) return;
-      cy.add(getFactorOutputCyJSON(getVariableName(), id));
+      cy.add(factorInputForFactor(getVariableName(), ele));
     }
   };
   return {
@@ -56594,47 +56607,7 @@ function buildProcessCommands(cy) {
           };
         })
       };
-      document.getElementById('namer').value = JSON.stringify(exportJSON); // Todo: validity check for unique names, DAG (for now)
-
-      /*const variables = cy.nodes(`node[type="${NODE_TYPES.VARIABLE}"]`).map(variableNode => ([
-        variableNode.id(),
-        {
-          type: variableNode.data().type,
-          variableType: variableNode.data().variableType,
-        }
-      ]));
-      let factor_inc = 0;
-      const factors = cy.nodes(`node[type="${NODE_TYPES.FACTOR}"]`).map(factorNode => {
-        const children = factorNode.children()
-        const inputs = arrayToObject(
-          children.filter(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
-          .first()
-          .children()
-          .map(input => [
-            input.id(),
-            input.incomers().filter('node').map(incomer => incomer.id())
-          ])
-          .map(([k, v]) => [k, v[0]])
-        );
-         const outputs = arrayToObject(
-          children.filter(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
-          .map(output => [
-            output.id(),
-            output.outgoers().filter('node').map(outgoer => outgoer.id())
-          ])
-        );
-         return [
-          factorNode.id(),
-          {
-            type: factorNode.data().type,
-            inputs,
-            outputs,
-          }
-        ];
-      });
-       const nodeMap = [...variables, ...factors].reduce((acc, [id, node]) => ({...acc, [id]: node }), {});
-      const json = JSON.stringify(nodeMap);
-      */
+      document.getElementById('namer').value = JSON.stringify(exportJSON);
     }
   };
   var importJSONCommand = {
@@ -56646,34 +56619,6 @@ function buildProcessCommands(cy) {
       cy.json({
         elements: elementsCyJSON
       });
-      /*
-      const nodes = Object.entries(nodeMap)
-      const loadTypes = [NODE_TYPES.VARIABLE, NODE_TYPES.FACTOR];
-      const [variables, factors] = loadTypes.map(
-        loadType => nodes.filter(([k, v]) => v.type == loadType)
-      );
-      
-      cy.add(variables.map(([id, v]) => getVariableCyJSON(id, v.variableType, id)));
-            cy.add(factors.map(([id, f]) => getFactorCyJSON(id)));
-       cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
-        .map(([inputId, variableId]) => getFactorInputCyJSON(
-          inputId,
-          factorId,
-        ))
-      ).flat());
-       cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
-        .map(([outputId, variableId]) => getFactorOutputCyJSON(
-          outputId,
-          factorId,
-        ))
-      ).flat());      
-       cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
-        .map(([inputId, variableId]) => getEdgeCyJSON(variableId, inputId))
-      ).flat());
-       cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
-        .map(([outputId, variableId]) => getEdgeCyJSON(outputId, variableId))
-      ).flat());
-      */
     }
   };
   return {
@@ -56730,6 +56675,7 @@ var arrayToObject = function arrayToObject(arr) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildVariableNameCommands; });
 /* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56739,21 +56685,22 @@ function _objectWithoutProperties(source, excluded) { if (source == null) return
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
 
+
 function buildVariableNameCommands(cy) {
   var renameNodeCommand = {
     content: 'Rename',
     select: function select(ele) {
-      var rename = window.prompt("Rename ".concat(ele.id(), " to:"), ele.id());
+      var _ele$data = ele.data(),
+          id = _ele$data.id,
+          data = _objectWithoutProperties(_ele$data, ["id"]);
+
+      var rename = window.prompt("Rename ".concat(id, " to:"), id);
 
       if (rename) {
         if (cy.getElementById(rename).length > 0) {
           console.log("Name already in use.");
           return;
         }
-
-        var _ele$data = ele.data(),
-            id = _ele$data.id,
-            data = _objectWithoutProperties(_ele$data, ["id"]);
 
         var newNode = cy.add({
           group: 'nodes',
@@ -56762,15 +56709,25 @@ function buildVariableNameCommands(cy) {
           }),
           position: ele.position()
         });
-        cy.add(ele.incomers().filter('node').map(function (incomer) {
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_0__["getEdgeCyJSON"])(incomer.id(), rename);
-        }));
-        cy.add(ele.outgoers().filter('node').map(function (outgoer) {
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_0__["getEdgeCyJSON"])(rename, outgoer.id());
-        }));
-        ele.children().forEach(function (child) {
-          return child.data('parent', rename);
+        var newId = newNode.id();
+        ele.incomers().filter('edge').move({
+          target: newId
         });
+        ele.outgoers().filter('edge').move({
+          source: newId
+        }); // Update inputs and outputs
+
+        ele.descendants().filter("node[factor=\"".concat(id, "\"]")).forEach(function (descendant) {
+          return descendant.data('factor', rename);
+        });
+
+        if (ele.data().type == _constants__WEBPACK_IMPORTED_MODULE_1__["NODE_TYPES"].FACTOR) {
+          // Update input and output containers
+          ele.children().move({
+            parent: newId
+          });
+        }
+
         ele.remove();
       }
     }

@@ -3,6 +3,13 @@ import torch
 from igraph import Graph
 #from graph_tool.topology import is_DAG, topological_sort 
 
+FACTOR = 'FACTOR'
+VARIABLE = 'VARIABLE'
+FACTOR_INPUT = 'FACTOR_INPUT'
+FACTOR_OUTPUT = 'FACTOR_OUTPUT'
+FACTOR_INPUT_CONTAINER = 'FACTOR_INPUT_CONTAINER'
+FACTOR_OUTPUT_CONTAINER = 'FACTOR_OUTPUT_CONTAINER'
+
 class SyllogPyroModel(object):
     """
     A Syllog-generated model for Pyro
@@ -67,22 +74,18 @@ class SyllogPyroModel(object):
         self.factors = factors
         
     @classmethod 
-    def from_json(cls, graph_json):
+    def from_cyjson(cls, graph_cyjson):
         """
         Arguments:
-
-        graph_json: a json string of the format: 
-        {
-            nodes: [{ name: 'string', type: 'string'  }, ...], 
-            edges: [['source_name', 'target_name'], ...],
-            target: 'target_name',
-        }
+        graph_cyjson
 
         Returns:
         An instance of SyllogPyroModel
 
         """
-        graph = json.loads(graph_json)
+        graph = json.loads(graph_cyjson)
+        variable_nodes = [node for node in graph['nodes'] if node['type'] == VARIABLE]
+
         return cls(graph, None)
 
     def get_factor_descriptions(self):
