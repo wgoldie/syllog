@@ -8,46 +8,63 @@ class SyllogPyroModel(object):
     A Syllog-generated model for Pyro
     
     """
-    def __init__(self, nodes, edges, target=None):
+    def __init__(self, nodes, target=None):
         """
         Arguments:
 
-        nodes: a sequence of dictionary-like objects { name, type }
-        edges: a sequence of length 2 sequences (source_name, target_name)
+        nodes: an ordered dictionary-like object { name: { type, ?variableType } }
         target: a string identifying a node to target calculation of
         """
-        
-        # TODO: check if names are unique
-        
+
+        variable_names = ([key for (key, value) in nodes.items() if value['type'] == 'variable'])
+        if target is not None and target not in variable_names:
+            raise Exception('Invalid target')
+        self.target = target or variable_names[-1]
+        factors = {name:node for name, node in nodes.items() if node['type'] == 'factor'}
+        factor_outputs = [output for node in factors.values() for output in node['outputs']]
+     
+        # validate input
+        if len(factor_outputs) != len(set(factor_outputs)):
+            raise Exception("Factors may not share outputs; Nodes may only result from one factor")
+        for name, node in nodes.items():
+            if node.get('type', None) not in ['factor', 'variable']:
+                raise Exception("All nodes must have type of factor or variable.")
+            if node['type'] == 'factor':
+                outputs = node.get('outputs', None)
+                if outputs is None or not set(outputs).issubset(set(variable_names)):
+                    raise Exception("All factor nodes must have an output set of variables")
+            if node['type'] == 'variable':
+                if node.get('variableType', None).lower() not in ['latent', 'evidence', 'query']:
+                    raise Exception("All variable nodes must have type of latent, evidence, or query.")
+                if name not in factor_outputs:
+                    raise Exception("All variable nodes must result from a factor execution.")
         vertex_attrs = {
-            'name': [node['name'] for node in nodes],
-            'type': [node['type'] for node in nodes]
+            'name': list(nodes.keys()),
         }
-        
-        if len(set(vertex_attrs['name'])) is not len(vertex_attrs['name']):
+
+        if len(set(vertex_attrs['name'])) != len(vertex_attrs['name']):
             raise Exception("Graph is invalid: multiple nodes with the same name.")
-        
+
+        # use igraph to get a topological sorting of the graph
         graph = Graph(
             n=len(nodes),
             vertex_attrs=vertex_attrs,
             directed=True
         )
-        
-        graph.add_edges(edges)
 
-        # TODO: check if the graph is a DAG
+        for factor_name, node in factors.items():
+            graph.add_edges(
+                [(variable_name, factor_name) for variable_name in node['inputs']])
+            graph.add_edges(
+                [(factor_name, variable_name) for variable_name in node['outputs']])
+
         if not graph.is_dag():
             raise Exception("Only DAGs currently supported")
 
-        self.sort = graph.topological_sorting()
-        self.graph = graph
-        self.names = graph.vs['name']
-        self.types = graph.vs['type']
-        
-        if target is not None and target not in self.names:
-            raise Exception('Invalid target')
-
-        self.target = target or self.graph.vs['name'][-1]
+        sort_idx = graph.topological_sorting()
+        self.sort = graph.vs[sort_idx]['name']
+        self.nodes = nodes
+        self.factors = factors
         
     @classmethod 
     def from_json(cls, graph_json):
@@ -66,55 +83,48 @@ class SyllogPyroModel(object):
 
         """
         graph = json.loads(graph_json)
-        nodes = graph.get('nodes', None)
-        edges = graph.get('edges', None)
-        target = graph.get('target', None)
-        if not (edges and isinstance(edges, list) and nodes and isinstance(nodes, list)):
-            raise Exception()
-        return cls(nodes, edges, target)
+        return cls(graph, None)
 
     def get_factor_descriptions(self):
         """
         Returns:
 
         factor_descriptions: a dict-like object that specifies the dependencies of each node.
-        Note that parents may be an empty list: in this case, the node has no dependencies in the graph.
-
         """
         factor_descriptions = {
-            self.names[idx]: [
-                parent['name']
-                for parent 
-                in self.graph.vs[idx].predecessors()
-            ]
-            for idx in self.sort
+            name: { 'inputs': node['inputs'], 'outputs': node['outputs'] } 
+            for (name, node) in self.factors.items()
         }
+
         return factor_descriptions
 
-    def __call__(self, factors):
+    def __call__(self, factor_fns):
         """
         Arguments:
         
-        factors: a dict-like object of sampling functions for each node
-        each of which receives the values of the node's parents
+        factors: a dict-like object of sampling functions for each factor
+        each of which receives the values of the factor's parent variables (if any exist)
         as kwargs keyed on the parents' names
         """
 
         node_values = {}
 
-        for idx in self.sort:
-            name = self.names[idx]
-            vertex = self.graph.vs[idx]
-            factor_args = {
-                parent['name']: node_values[parent['name']]
-                for parent in vertex.predecessors()
-            }
+        for name in self.sort:
+            node = self.nodes[name]
+            if node['type'] == 'factor':
+                factor_args = {
+                    input_name: node_values[input_name]
+                    for input_name in node['inputs'] 
+                }
 
-            node_values[name] = factors[name](*factor_args.values())
+                factor_value = factor_fns[name](*factor_args.values())
 
-            # exit early if the rest of the graph is irrelevant
-            if name is self.target:
-                return node_values[name]
+                for output_name in node['outputs']:
+                    node_values[output_name] = factor_value
+
+                if self.target in node['outputs']:
+                    # exit early if the rest of the graph is irrelevant
+                    return node_values[self.target]
 
         return node_values[self.target]
     

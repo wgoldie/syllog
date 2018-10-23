@@ -17,8 +17,9 @@ import { EDITOR_MODES } from './constants';
 import { contextMenuReducer } from './contextMenus'
 
 import buildGraphCommands from './graphCommands';
-import buildNodeTypeCommands from './nodeTypeCommands';
+import buildVariableTypeCommands from './variableTypeCommands';
 import buildProcessCommands from './processCommands';
+import buildLayoutCommands from './layoutCommands';
 
 // Init cytoscape graph library
 const cy = cytoscape({
@@ -34,22 +35,20 @@ cy.json({
   //'elements': [{ group: 'nodes', data: {id: 0}}]
 })
 
-var commands = {
-  ...buildGraphCommands(cy),
-  ...buildNodeTypeCommands(cy),
-  ...buildProcessCommands(cy)
-};
+let variableNameIndex = 0;
+const variableNames = 'abcdefghijklmnopqrstuvwxyz'
+const getVariableName = function() {
+  const next = variableNames[variableNameIndex % 26]
+  variableNameIndex += 1
+  return `${next}${variableNameIndex > 26 ? Math.floor(variableNameIndex/26) : ''}`
+}
 
+const builders = [buildGraphCommands, buildVariableTypeCommands, buildProcessCommands, buildLayoutCommands];
+
+const commands = builders.reduce((acc, builder) => ({ ...builder(cy, getVariableName), ...acc }), {})
 var menus = contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
 
 /*
-const variableNameIndex = 0;
-const variableNames = 'abcdefghijklmnopqrstuvwyz'
-const getVariableName = function() {
-  variableNameIndex += 1
-  return variableNames[variableNameIndex % 26]
-}
-
 var menus = []
 
 function contextMenus(_mode, _isDirected) { 

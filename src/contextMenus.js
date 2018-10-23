@@ -16,12 +16,14 @@ function buildCommandLists(cy, commands, mode) {
     queryNodeCommand,
     latentNodeCommand,
     evidenceNodeCommand,
+    factorNodeCommand,
     edgeCommand,
     rmCommand,
     setLatentCommand,
     setEvidenceCommand,
     setQueryCommand,
     exportJSONCommand,
+    layoutCommand
   } = commands; 
 
   switch (mode) {
@@ -36,9 +38,9 @@ function buildCommandLists(cy, commands, mode) {
         ],
         'core': [
           ...coreBase,
-          queryNodeCommand,
+          layoutCommand,
           latentNodeCommand,
-          evidenceNodeCommand,
+          factorNodeCommand,
           exportJSONCommand,
         ],
       }

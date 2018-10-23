@@ -1,3 +1,5 @@
+import { NODE_TYPES, VARIABLE_TYPES } from './constants';
+
 /*
  * Returns a json object that can be 
  * provided to cytoscape as a style.
@@ -5,13 +7,24 @@
 export function getStyle(isDirected) {
   const style = [
     {
-      selector: 'node',
+      selector: `node[type="${NODE_TYPES.VARIABLE}"]`,
       style: {
         shape: 'ellipse',
         'border-width':'2',
         'background-color': 'white',
         'label': function(ele) {
-          return ele.data('name')+'_'+(ele.data('inc')|' ')
+          return ele.data('name')
+        }
+      }
+    },
+    {
+      selector: `node[type="${NODE_TYPES.FACTOR}"]`,
+      style: {
+        shape: 'square',
+        'border-width':'2',
+        'background-color': 'white',
+        'label': function(ele) {
+          return ele.data('name')
         }
       }
     },
@@ -20,15 +33,15 @@ export function getStyle(isDirected) {
       style: {'border-color':'data(color)'}
     },
     {
-      selector: 'node[nodeType="evidence"]',
+      selector: `node[variableType="${VARIABLE_TYPES.EVIDENCE}"]`,
       style: {'background-color': 'grey'}
     },
     {
-      selector: 'node[nodeType="latent"]',
+      selector: `node[variableType="${VARIABLE_TYPES.LATENT}"]`,
       style: {'background-color': 'white'}
     },
     {
-      selector: 'node[nodeType="query"]',
+      selector: `node[variableType="${VARIABLE_TYPES.QUERY}"]`,
       style: {'background-color': 'blue'}
     },
     {

@@ -55827,15 +55827,26 @@ module.exports = function(module) {
 /*!**************************!*\
   !*** ./src/constants.js ***!
   \**************************/
-/*! exports provided: EDITOR_MODES */
+/*! exports provided: EDITOR_MODES, NODE_TYPES, VARIABLE_TYPES */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EDITOR_MODES", function() { return EDITOR_MODES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NODE_TYPES", function() { return NODE_TYPES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "VARIABLE_TYPES", function() { return VARIABLE_TYPES; });
 var EDITOR_MODES = {
   EDIT: 'EDIT',
   ANALYZE: 'ANALYZE'
+};
+var NODE_TYPES = {
+  VARIABLE: 'VARIABLE',
+  FACTOR: 'FACTOR'
+};
+var VARIABLE_TYPES = {
+  LATENT: 'LATENT',
+  EVIDENCE: 'EVIDENCE',
+  QUERY: 'QUERY'
 };
 
 /***/ }),
@@ -55874,18 +55885,20 @@ function buildCommandLists(cy, commands, mode) {
   var queryNodeCommand = commands.queryNodeCommand,
       latentNodeCommand = commands.latentNodeCommand,
       evidenceNodeCommand = commands.evidenceNodeCommand,
+      factorNodeCommand = commands.factorNodeCommand,
       edgeCommand = commands.edgeCommand,
       rmCommand = commands.rmCommand,
       setLatentCommand = commands.setLatentCommand,
       setEvidenceCommand = commands.setEvidenceCommand,
       setQueryCommand = commands.setQueryCommand,
-      exportJSONCommand = commands.exportJSONCommand;
+      exportJSONCommand = commands.exportJSONCommand,
+      layoutCommand = commands.layoutCommand;
 
   switch (mode) {
     case _constants__WEBPACK_IMPORTED_MODULE_0__["EDITOR_MODES"].EDIT:
       return {
         'node': [edgeCommand, rmCommand, setLatentCommand, setEvidenceCommand, setQueryCommand],
-        'core': coreBase.concat([queryNodeCommand, latentNodeCommand, evidenceNodeCommand, exportJSONCommand])
+        'core': coreBase.concat([layoutCommand, latentNodeCommand, factorNodeCommand, exportJSONCommand])
       };
 
     default:
@@ -55945,29 +55958,43 @@ function contextMenuReducer(cy, commands, menus, mode) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildGraphCommands; });
-function buildGraphCommands(cy) {
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+
+function buildGraphCommands(cy, getVariableName) {
+  /*
+   * Creates a factor node 
+   */
+  var factorNodeCommand = {
+    content: "Factor",
+    select: function select(ele, ev) {
+      cy.add({
+        data: {
+          'name': 'factor',
+          'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR
+        },
+        position: ev.position
+      });
+    }
+  };
   /*
    * Creates a node with the given type
    */
-  var nodeCommand = function nodeCommand(type) {
+
+  var variableCommand = function variableCommand(variableType) {
     return {
-      content: "".concat(type, " Node"),
+      content: "".concat(variableType, " Node"),
       select: function select(ele, ev) {
         cy.add({
           data: {
-            'name': type,
-            'inc': 0,
-            'nodeType': type
+            'name': getVariableName(),
+            'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE,
+            'variableType': variableType
           },
           position: ev.position
         });
       }
     };
   };
-
-  var queryNodeCommand = nodeCommand('query');
-  var evidenceNodeCommand = nodeCommand('evidence');
-  var latentNodeCommand = nodeCommand('latent');
   /* 
    * Begins drawing a new edge at
    * the selected node. Node that we
@@ -55975,10 +56002,46 @@ function buildGraphCommands(cy) {
    * behavior hooks.
    */
 
+
   var eh = cy.edgehandles({});
   eh.disable();
   cy.on('ehstop', function () {
-    eh.disable();
+    return eh.disable();
+  });
+  cy.on('ehcomplete', function (e, source, target, added) {
+    if (source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) {
+      cy.remove(added);
+      console.log("No edges allowed between factor nodes");
+      return;
+    }
+
+    if (source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE) {
+      // insert a factor automatically if the user connects two variables
+      var factorPosition = added[0].midpoint();
+      cy.remove(added);
+      var newFactor = cy.add({
+        group: 'nodes',
+        position: factorPosition,
+        data: {
+          type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR,
+          name: 'factor'
+        }
+      });
+      cy.add([{
+        group: 'edges',
+        data: {
+          source: source.id(),
+          target: newFactor.id()
+        }
+      }, {
+        group: 'edges',
+        data: {
+          source: newFactor.id(),
+          target: target.id()
+        }
+      }]);
+      return;
+    }
   });
   var edgeCommand = {
     content: 'Edge',
@@ -55998,9 +56061,10 @@ function buildGraphCommands(cy) {
     }
   };
   return {
-    queryNodeCommand: queryNodeCommand,
-    evidenceNodeCommand: evidenceNodeCommand,
-    latentNodeCommand: latentNodeCommand,
+    queryNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].QUERY),
+    evidenceNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].EVIDENCE),
+    latentNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].LATENT),
+    factorNodeCommand: factorNodeCommand,
     edgeCommand: edgeCommand,
     rmCommand: rmCommand
   };
@@ -56018,19 +56082,32 @@ function buildGraphCommands(cy) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getStyle", function() { return getStyle; });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+
 /*
  * Returns a json object that can be 
  * provided to cytoscape as a style.
  */
+
 function getStyle(isDirected) {
   var style = [{
-    selector: 'node',
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]"),
     style: {
       shape: 'ellipse',
       'border-width': '2',
       'background-color': 'white',
       'label': function label(ele) {
-        return ele.data('name') + '_' + (ele.data('inc') | ' ');
+        return ele.data('name');
+      }
+    }
+  }, {
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]"),
+    style: {
+      shape: 'square',
+      'border-width': '2',
+      'background-color': 'white',
+      'label': function label(ele) {
+        return ele.data('name');
       }
     }
   }, {
@@ -56039,17 +56116,17 @@ function getStyle(isDirected) {
       'border-color': 'data(color)'
     }
   }, {
-    selector: 'node[nodeType="evidence"]',
+    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].EVIDENCE, "\"]"),
     style: {
       'background-color': 'grey'
     }
   }, {
-    selector: 'node[nodeType="latent"]',
+    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].LATENT, "\"]"),
     style: {
       'background-color': 'white'
     }
   }, {
-    selector: 'node[nodeType="query"]',
+    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].QUERY, "\"]"),
     style: {
       'background-color': 'blue'
     }
@@ -56091,8 +56168,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
 /* harmony import */ var _contextMenus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./contextMenus */ "./src/contextMenus.js");
 /* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
-/* harmony import */ var _nodeTypeCommands__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./nodeTypeCommands */ "./src/nodeTypeCommands.js");
+/* harmony import */ var _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./variableTypeCommands */ "./src/variableTypeCommands.js");
 /* harmony import */ var _processCommands__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./processCommands */ "./src/processCommands.js");
+/* harmony import */ var _layoutCommands__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layoutCommands */ "./src/layoutCommands.js");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56113,6 +56191,7 @@ cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_edgehandles__WEBP
 
 
 
+
  // Init cytoscape graph library
 
 var cy = cytoscape__WEBPACK_IMPORTED_MODULE_0___default()({
@@ -56126,18 +56205,21 @@ cy.json({
   'style': Object(_graphStyle__WEBPACK_IMPORTED_MODULE_5__["getStyle"])(true) //'elements': [{ group: 'nodes', data: {id: 0}}]
 
 });
+var variableNameIndex = 0;
+var variableNames = 'abcdefghijklmnopqrstuvwxyz';
 
-var commands = _objectSpread({}, Object(_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"])(cy), Object(_nodeTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"])(cy), Object(_processCommands__WEBPACK_IMPORTED_MODULE_10__["default"])(cy));
+var getVariableName = function getVariableName() {
+  var next = variableNames[variableNameIndex % 26];
+  variableNameIndex += 1;
+  return "".concat(next).concat(variableNameIndex > 26 ? Math.floor(variableNameIndex / 26) : '');
+};
 
+var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"]];
+var commands = builders.reduce(function (acc, builder) {
+  return _objectSpread({}, builder(cy, getVariableName), acc);
+}, {});
 var menus = Object(_contextMenus__WEBPACK_IMPORTED_MODULE_7__["contextMenuReducer"])(cy, commands, [], _constants__WEBPACK_IMPORTED_MODULE_6__["EDITOR_MODES"].EDIT);
 /*
-const variableNameIndex = 0;
-const variableNames = 'abcdefghijklmnopqrstuvwyz'
-const getVariableName = function() {
-  variableNameIndex += 1
-  return variableNames[variableNameIndex % 26]
-}
-
 var menus = []
 
 function contextMenus(_mode, _isDirected) { 
@@ -56168,34 +56250,27 @@ function download(filename, text) {
 
 /***/ }),
 
-/***/ "./src/nodeTypeCommands.js":
-/*!*********************************!*\
-  !*** ./src/nodeTypeCommands.js ***!
-  \*********************************/
+/***/ "./src/layoutCommands.js":
+/*!*******************************!*\
+  !*** ./src/layoutCommands.js ***!
+  \*******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildNodeTypeCommands; });
-function buildNodeTypeCommands(cy) {
-  /*
-   * Set a node to a specific type
-   * for PGM analysis
-   */
-  var setNodeTypeCommand = function setNodeTypeCommand(type) {
-    return {
-      content: "Set to ".concat(type),
-      select: function select(ele) {
-        ele.data('nodeType', type);
-      }
-    };
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildLayoutCommands; });
+function buildLayoutCommands(cy) {
+  var layoutCommand = {
+    content: 'Relayout graph',
+    select: function select() {
+      cy.layout({
+        name: 'dagre'
+      }).run();
+    }
   };
-
   return {
-    setLatentCommand: setNodeTypeCommand('latent'),
-    setQueryCommand: setNodeTypeCommand('query'),
-    setEvidenceCommand: setNodeTypeCommand('evidence')
+    layoutCommand: layoutCommand
   };
 }
 
@@ -56211,24 +56286,62 @@ function buildNodeTypeCommands(cy) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildProcessCommands; });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+
 function buildProcessCommands(cy) {
   var exportJSONCommand = {
     content: 'Export Graph JSON',
     select: function select() {
       // Todo: validity check for unique names, DAG (for now)
-      var nodes = cy.nodes().map(function (node) {
-        return {
-          name: node.data().name,
-          type: node.data().type
-        };
+      var variables = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]")).map(function (variableNode) {
+        return [variableNode.data().name, {
+          type: 'variable',
+          variableType: variableNode.data().variableType
+        }];
       });
-      var edges = cy.edges().map(function (edge) {
-        return [edge.source().data().name, edge.target().data().name];
+      var factors = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]")).map(function (factorNode) {
+        var inputs = factorNode.incomers().filter('node').map(function (inputNode) {
+          return inputNode.data().name;
+        });
+        var outputs = factorNode.outgoers().filter('node').map(function (outputNode) {
+          return outputNode.data().name;
+        });
+        return ["".concat(inputs.join(','), "=>").concat(outputs.join(',')), {
+          type: 'factor',
+          inputs: inputs,
+          outputs: outputs
+        }];
       });
-      var json = JSON.stringify({
-        nodes: nodes,
-        edges: edges
-      });
+
+      var nodeMap = _toConsumableArray(variables).concat(_toConsumableArray(factors)).reduce(function (acc, _ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            name = _ref2[0],
+            node = _ref2[1];
+
+        return _objectSpread({}, acc, _defineProperty({}, name, node));
+      }, {});
+
+      var json = JSON.stringify(nodeMap);
       console.log(json);
     }
   };
@@ -56237,6 +56350,41 @@ function buildProcessCommands(cy) {
   };
 }
 ;
+
+/***/ }),
+
+/***/ "./src/variableTypeCommands.js":
+/*!*************************************!*\
+  !*** ./src/variableTypeCommands.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildVariableTypeCommands; });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+
+function buildVariableTypeCommands(cy) {
+  /*
+   * Set a variable node to a specific type
+   * for PGM analysis
+   */
+  var setVariableTypeCommand = function setVariableTypeCommand(type) {
+    return {
+      content: "Set to ".concat(type),
+      select: function select(ele) {
+        ele.data('variableType', type);
+      }
+    };
+  };
+
+  return {
+    setLatentCommand: setVariableTypeCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].LATENT),
+    setQueryCommand: setVariableTypeCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].QUERY),
+    setEvidenceCommand: setVariableTypeCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].EVIDENCE)
+  };
+}
 
 /***/ })
 

@@ -1,24 +1,40 @@
-export default function buildGraphCommands(cy) {
+import { NODE_TYPES, VARIABLE_TYPES } from './constants';
+
+export default function buildGraphCommands(cy, getVariableName) {
+
   /*
-   * Creates a node with the given type
+   * Creates a factor node 
    */
-  const nodeCommand = (type) => ({
-    content: `${type} Node`,
+  const factorNodeCommand = ({
+    content: `Factor`,
     select: function(ele, ev) {
       cy.add({
         data: {
-          'name': type,
-          'inc': 0,
-          'nodeType': type
-        },
+          'name': 'factor',
+          'type': NODE_TYPES.FACTOR, 
+        }, 
         position: ev.position
       })
     }
-  });
+  }) 
+  
+  /*
+   * Creates a node with the given type
+   */
+  const variableCommand = (variableType) => ({
+    content: `${variableType} Node`,
+    select: function(ele, ev) {
+      cy.add({
+        data: {
+          'name': getVariableName(),
+          'type': NODE_TYPES.VARIABLE, 
+          'variableType': variableType,
+        }, 
+        position: ev.position
+      })
+    }
+  })
 
-  const queryNodeCommand = nodeCommand('query');
-  const evidenceNodeCommand = nodeCommand('evidence');
-  const latentNodeCommand = nodeCommand('latent');
 
   /* 
    * Begins drawing a new edge at
@@ -28,7 +44,49 @@ export default function buildGraphCommands(cy) {
    */
   const eh = cy.edgehandles({})
   eh.disable()
-  cy.on('ehstop', function(){ eh.disable() })
+  cy.on('ehstop', () => eh.disable())
+  cy.on('ehcomplete', (e, source, target, added) => {
+    
+    if (
+      source.data().type === NODE_TYPES.FACTOR 
+      && target.data().type === NODE_TYPES.FACTOR 
+    ) {
+      cy.remove(added);
+      console.log("No edges allowed between factor nodes");
+      return;
+    }
+
+    if (
+      source.data().type === NODE_TYPES.VARIABLE
+      && target.data().type === NODE_TYPES.VARIABLE 
+    ) {
+      // insert a factor automatically if the user connects two variables
+      const factorPosition = added[0].midpoint()
+      cy.remove(added);
+      const newFactor = cy.add({
+        group: 'nodes',
+        position: factorPosition,
+        data: { type: NODE_TYPES.FACTOR, name: 'factor' }
+      });
+      cy.add([
+        { group: 'edges',
+          data: {
+            source: source.id(),
+            target: newFactor.id(),
+          },
+        },
+        { group: 'edges',
+          data: {
+            source: newFactor.id(), 
+            target: target.id(),
+          },
+        },
+      ]);
+      return;
+    }
+
+  });
+
   const edgeCommand = {
     content: 'Edge',
     select: function(ele) {
@@ -48,9 +106,10 @@ export default function buildGraphCommands(cy) {
   }
 
   return {
-    queryNodeCommand,
-    evidenceNodeCommand,
-    latentNodeCommand,
+    queryNodeCommand: variableCommand(VARIABLE_TYPES.QUERY),
+    evidenceNodeCommand: variableCommand(VARIABLE_TYPES.EVIDENCE),
+    latentNodeCommand: variableCommand(VARIABLE_TYPES.LATENT),
+    factorNodeCommand,
     edgeCommand,
     rmCommand
   }; 

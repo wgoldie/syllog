@@ -3,7 +3,7 @@ export const evidenceNodeCommand = {
   select: function(ele, ev) {
     const nodeName = getVariableName() 
     //prepareLabel(nodeName)
-    cy.add({ data: { 'name': nodeName, 'inc': 0, 'nodeType': 'evidence' }, position: ev.position })
+    cy.add({ data: { 'name': nodeName, 'inc': 0, 'variableType': 'evidence' }, position: ev.position })
   }
 }
 
@@ -12,7 +12,7 @@ const queryNodeCommand = {
   select: function(ele, ev) {
     const nodeName = getVariableName() 
     //prepareLabel(nodeName)
-    cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'query' }, position: ev.position })
+    cy.add({ data: { 'name': nodeName,  'inc': 0, 'variableType': 'query' }, position: ev.position })
   }
 }
 
@@ -21,7 +21,7 @@ export const latentNodeCommand = {
   select: function(ele, ev) {
     const nodeName = getVariableName() 
     //prepareLabel(nodeName)
-    cy.add({ data: { 'name': nodeName,  'inc': 0, 'nodeType': 'latent' }, position: ev.position })
+    cy.add({ data: { 'name': nodeName,  'inc': 0, 'variableType': 'latent' }, position: ev.position })
   }
 }
 
@@ -35,7 +35,7 @@ export export const layoutCommand = {
 export const tikzCommand = {
   content: 'Tikz',
   select: function() {
-    nodes = cy.filter('node[nodeType]')
+    nodes = cy.filter('node[variableType]')
     edges = nodes.connectedEdges()
     lines = ""
     xpos = nodes.map(function(node,i) { return [node.position('x'), node] })
@@ -51,7 +51,7 @@ export const tikzCommand = {
     //lines += '\\begin{tikzpicture}[scale=10]\n'  
     lines += '%%tikz -l bayesnet\n'  
     nodes.forEach(function(node) {
-      type = node.data('nodeType') == 'evidence' ? 'obs' : 'latent'
+      type = node.data('variableType') == 'evidence' ? 'obs' : 'latent'
       id = node.id().replace('-','')
       xidx = xsorted.indexOf(node.position('x'))
       right = xidx > 0 ? xsorted[xidx-1] : null 
@@ -133,13 +133,13 @@ function color(ele, color) {
 }
 
 function isQuery(ele) {
-  return ele.data('nodeType') == 'query'
+  return ele.data('variableType') == 'query'
 }
 function isLatent(ele) {
-  return ele.data('nodeType') == 'latent'
+  return ele.data('variableType') == 'latent'
 }
 function isEvidence(ele) {
-  return ele.data('nodeType') == 'evidence'
+  return ele.data('variableType') == 'evidence'
 }
 function isColor(ele, color) {
   return ele.data('color') == color
@@ -190,14 +190,14 @@ var splitCommand = {
     color(cy.filter(), 'black')
     graph = subgraph(ele)
     graph.data('color', 'red')
-    xe = graph.filter('node[nodeType="evidence"]')
-    xf = graph.filter('node[nodeType="query"]')
+    xe = graph.filter('node[variableType="evidence"]')
+    xf = graph.filter('node[variableType="query"]')
     xr = graph.difference(xe).difference(xf)
     /*color(xe,'grey')
     color(xf,'blue')
     color(xr,'white')*/
     dindep(ele, graph)
-    condep = graph.filter('node[color="blue"],node[color="yellow"]').filter('node[nodeType!="evidence"]')
+    condep = graph.filter('node[color="blue"],node[color="yellow"]').filter('node[variableType!="evidence"]')
     color(graph, 'black')
     color(condep, 'orange')
   }
