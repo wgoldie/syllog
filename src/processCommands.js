@@ -6,8 +6,14 @@ export default function buildProcessCommands(cy) {
   const exportJSONCommand = {
     content: 'Export Graph JSON',
     select: function() {
+      const elementsCyJSON = cy.json().elements;
+      const exportJSON = {
+        nodes: elementsCyJSON.nodes.map(({ data }) => ({ data })),
+        edges: elementsCyJSON.edges.map(({ data }) => ({ data })),
+      }
+      document.getElementById('namer').value = JSON.stringify(exportJSON);
       // Todo: validity check for unique names, DAG (for now)
-      const variables = cy.nodes(`node[type="${NODE_TYPES.VARIABLE}"]`).map(variableNode => ([
+      /*const variables = cy.nodes(`node[type="${NODE_TYPES.VARIABLE}"]`).map(variableNode => ([
         variableNode.id(),
         {
           type: variableNode.data().type,
@@ -18,7 +24,9 @@ export default function buildProcessCommands(cy) {
       const factors = cy.nodes(`node[type="${NODE_TYPES.FACTOR}"]`).map(factorNode => {
         const children = factorNode.children()
         const inputs = arrayToObject(
-          children.filter(`node[type="${NODE_TYPES.FACTOR_INPUT}"]`)
+          children.filter(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
+          .first()
+          .children()
           .map(input => [
             input.id(),
             input.incomers().filter('node').map(incomer => incomer.id())
@@ -27,7 +35,7 @@ export default function buildProcessCommands(cy) {
         );
 
         const outputs = arrayToObject(
-          children.filter(`node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`)
+          children.filter(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
           .map(output => [
             output.id(),
             output.outgoers().filter('node').map(outgoer => outgoer.id())
@@ -46,7 +54,7 @@ export default function buildProcessCommands(cy) {
 
       const nodeMap = [...variables, ...factors].reduce((acc, [id, node]) => ({...acc, [id]: node }), {});
       const json = JSON.stringify(nodeMap);
-      document.getElementById('namer').value = json;
+      */
     }
   };
 
@@ -56,7 +64,9 @@ export default function buildProcessCommands(cy) {
     select: function() {
       cy.elements().remove()
       const json = document.getElementById('namer').value;
-      const nodeMap = JSON.parse(json);
+      const elementsCyJSON = JSON.parse(json);
+      cy.json({elements: elementsCyJSON});
+      /*
       const nodes = Object.entries(nodeMap)
       const loadTypes = [NODE_TYPES.VARIABLE, NODE_TYPES.FACTOR];
       const [variables, factors] = loadTypes.map(
@@ -88,6 +98,7 @@ export default function buildProcessCommands(cy) {
       cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
         .map(([outputId, variableId]) => getEdgeCyJSON(outputId, variableId))
       ).flat());
+      */
     }
   };
 

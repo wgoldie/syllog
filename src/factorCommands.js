@@ -7,19 +7,35 @@ export const getFactorCyJSON = (id) => ({
   }, 
 });
 
+export const getFactorContainersCyJSON = id => ([
+  {
+    data: {
+      id: `${id}__inputs`,
+      type: NODE_TYPES.FACTOR_INPUT_CONTAINER,
+      parent: id,
+    },
+  }, {
+    data: {
+      id: `${id}__outputs`,
+      type: NODE_TYPES.FACTOR_OUTPUT_CONTAINER,
+      parent: id,
+    }
+  }
+])
+
 export const getFactorInputCyJSON = (id, parentFactorId) => ({
   data: {
     id,
     type: NODE_TYPES.FACTOR_INPUT,
-    parent: parentFactorId,
+    parent: `${parentFactorId}__inputs`,
   },
 });
 
 export const getFactorOutputCyJSON = (id, parentFactorId) => ({
   data: {
     id,
-    'type': NODE_TYPES.FACTOR_OUTPUT,
-    'parent': parentFactorId,
+    type: NODE_TYPES.FACTOR_OUTPUT,
+    parent: `${parentFactorId}__outputs`,
   },
 });
 
@@ -30,9 +46,10 @@ export function makeFactor(cy, getVariableName, position) {
     position
   });
 
+  const containers = cy.add(getFactorContainersCyJSON(factor.id()));
+
   const output = cy.add({
     ...getFactorOutputCyJSON(getVariableName(), factor.id()),
-    position
   });
   return [factor, output]
 }

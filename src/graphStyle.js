@@ -46,18 +46,23 @@ export function getStyle(isDirected) {
       style: {
         shape: 'square',
         'border-style': 'dashed',
+        'text-valign': 'top',
       }
     },
     {
-      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"]`,
+      selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`,
       style: {
         shape: 'square',
+        label: 'Outputs',
+        'text-valign': 'top',
       }
     },
     {
-      selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
+      selector: `node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`,
       style: {
         shape: 'square',
+        label: 'Inputs',
+        'text-valign': 'top',
       }
     },
     {

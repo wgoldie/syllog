@@ -55962,6 +55962,8 @@ var EDITOR_MODES = {
 var NODE_TYPES = {
   VARIABLE: 'VARIABLE',
   FACTOR: 'FACTOR',
+  FACTOR_INPUT_CONTAINER: 'FACTOR_INPUT_CONTAINER',
+  FACTOR_OUTPUT_CONTAINER: 'FACTOR_OUTPUT_CONTAINER',
   FACTOR_INPUT: 'FACTOR_INPUT',
   FACTOR_OUTPUT: 'FACTOR_OUTPUT'
 };
@@ -56076,12 +56078,13 @@ function contextMenuReducer(cy, commands, menus, mode) {
 /*!*******************************!*\
   !*** ./src/factorCommands.js ***!
   \*******************************/
-/*! exports provided: getFactorCyJSON, getFactorInputCyJSON, getFactorOutputCyJSON, makeFactor, default */
+/*! exports provided: getFactorCyJSON, getFactorContainersCyJSON, getFactorInputCyJSON, getFactorOutputCyJSON, makeFactor, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorCyJSON", function() { return getFactorCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorContainersCyJSON", function() { return getFactorContainersCyJSON; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorInputCyJSON", function() { return getFactorInputCyJSON; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorOutputCyJSON", function() { return getFactorOutputCyJSON; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeFactor", function() { return makeFactor; });
@@ -56100,12 +56103,27 @@ var getFactorCyJSON = function getFactorCyJSON(id) {
     }
   };
 };
+var getFactorContainersCyJSON = function getFactorContainersCyJSON(id) {
+  return [{
+    data: {
+      id: "".concat(id, "__inputs"),
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT_CONTAINER,
+      parent: id
+    }
+  }, {
+    data: {
+      id: "".concat(id, "__outputs"),
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT_CONTAINER,
+      parent: id
+    }
+  }];
+};
 var getFactorInputCyJSON = function getFactorInputCyJSON(id, parentFactorId) {
   return {
     data: {
       id: id,
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT,
-      parent: parentFactorId
+      parent: "".concat(parentFactorId, "__inputs")
     }
   };
 };
@@ -56113,8 +56131,8 @@ var getFactorOutputCyJSON = function getFactorOutputCyJSON(id, parentFactorId) {
   return {
     data: {
       id: id,
-      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT,
-      'parent': parentFactorId
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT,
+      parent: "".concat(parentFactorId, "__outputs")
     }
   };
 };
@@ -56122,9 +56140,8 @@ function makeFactor(cy, getVariableName, position) {
   var factor = cy.add(_objectSpread({}, getFactorCyJSON(getVariableName()), {
     position: position
   }));
-  var output = cy.add(_objectSpread({}, getFactorOutputCyJSON(getVariableName(), factor.id()), {
-    position: position
-  }));
+  var containers = cy.add(getFactorContainersCyJSON(factor.id()));
+  var output = cy.add(_objectSpread({}, getFactorOutputCyJSON(getVariableName(), factor.id())));
   return [factor, output];
 }
 function buildGraphCommands(cy, getVariableName) {
@@ -56370,17 +56387,22 @@ function getStyle(isDirected) {
     selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]"),
     style: {
       shape: 'square',
-      'border-style': 'dashed'
+      'border-style': 'dashed',
+      'text-valign': 'top'
     }
   }, {
-    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]"),
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT_CONTAINER, "\"]"),
     style: {
-      shape: 'square'
+      shape: 'square',
+      label: 'Outputs',
+      'text-valign': 'top'
     }
   }, {
-    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]"),
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT_CONTAINER, "\"]"),
     style: {
-      shape: 'square'
+      shape: 'square',
+      label: 'Inputs',
+      'text-valign': 'top'
     }
   }, {
     selector: 'node[color]',
@@ -56546,26 +56568,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
 /* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
 /* harmony import */ var _factorCommands__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factorCommands */ "./src/factorCommands.js");
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 
 
 
@@ -56574,49 +56576,62 @@ function buildProcessCommands(cy) {
   var exportJSONCommand = {
     content: 'Export Graph JSON',
     select: function select() {
-      // Todo: validity check for unique names, DAG (for now)
-      var variables = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]")).map(function (variableNode) {
-        return [variableNode.id(), {
+      var elementsCyJSON = cy.json().elements;
+      var exportJSON = {
+        nodes: elementsCyJSON.nodes.map(function (_ref) {
+          var data = _ref.data;
+          return {
+            data: data
+          };
+        }),
+        edges: elementsCyJSON.edges.map(function (_ref2) {
+          var data = _ref2.data;
+          return {
+            data: data
+          };
+        })
+      };
+      document.getElementById('namer').value = JSON.stringify(exportJSON); // Todo: validity check for unique names, DAG (for now)
+
+      /*const variables = cy.nodes(`node[type="${NODE_TYPES.VARIABLE}"]`).map(variableNode => ([
+        variableNode.id(),
+        {
           type: variableNode.data().type,
-          variableType: variableNode.data().variableType
-        }];
+          variableType: variableNode.data().variableType,
+        }
+      ]));
+      let factor_inc = 0;
+      const factors = cy.nodes(`node[type="${NODE_TYPES.FACTOR}"]`).map(factorNode => {
+        const children = factorNode.children()
+        const inputs = arrayToObject(
+          children.filter(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
+          .first()
+          .children()
+          .map(input => [
+            input.id(),
+            input.incomers().filter('node').map(incomer => incomer.id())
+          ])
+          .map(([k, v]) => [k, v[0]])
+        );
+         const outputs = arrayToObject(
+          children.filter(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
+          .map(output => [
+            output.id(),
+            output.outgoers().filter('node').map(outgoer => outgoer.id())
+          ])
+        );
+         return [
+          factorNode.id(),
+          {
+            type: factorNode.data().type,
+            inputs,
+            outputs,
+          }
+        ];
       });
-      var factor_inc = 0;
-      var factors = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]")).map(function (factorNode) {
-        var children = factorNode.children();
-        var inputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]")).map(function (input) {
-          return [input.id(), input.incomers().filter('node').map(function (incomer) {
-            return incomer.id();
-          })];
-        }).map(function (_ref) {
-          var _ref2 = _slicedToArray(_ref, 2),
-              k = _ref2[0],
-              v = _ref2[1];
-
-          return [k, v[0]];
-        }));
-        var outputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]")).map(function (output) {
-          return [output.id(), output.outgoers().filter('node').map(function (outgoer) {
-            return outgoer.id();
-          })];
-        }));
-        return [factorNode.id(), {
-          type: factorNode.data().type,
-          inputs: inputs,
-          outputs: outputs
-        }];
-      });
-
-      var nodeMap = _toConsumableArray(variables).concat(_toConsumableArray(factors)).reduce(function (acc, _ref3) {
-        var _ref4 = _slicedToArray(_ref3, 2),
-            id = _ref4[0],
-            node = _ref4[1];
-
-        return _objectSpread({}, acc, _defineProperty({}, id, node));
-      }, {});
-
-      var json = JSON.stringify(nodeMap);
-      document.getElementById('namer').value = json;
+       const nodeMap = [...variables, ...factors].reduce((acc, [id, node]) => ({...acc, [id]: node }), {});
+      const json = JSON.stringify(nodeMap);
+      */
     }
   };
   var importJSONCommand = {
@@ -56624,89 +56639,38 @@ function buildProcessCommands(cy) {
     select: function select() {
       cy.elements().remove();
       var json = document.getElementById('namer').value;
-      var nodeMap = JSON.parse(json);
-      var nodes = Object.entries(nodeMap);
-      var loadTypes = [_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR];
-
-      var _loadTypes$map = loadTypes.map(function (loadType) {
-        return nodes.filter(function (_ref5) {
-          var _ref6 = _slicedToArray(_ref5, 2),
-              k = _ref6[0],
-              v = _ref6[1];
-
-          return v.type == loadType;
-        });
-      }),
-          _loadTypes$map2 = _slicedToArray(_loadTypes$map, 2),
-          variables = _loadTypes$map2[0],
-          factors = _loadTypes$map2[1];
-
-      cy.add(variables.map(function (_ref7) {
-        var _ref8 = _slicedToArray(_ref7, 2),
-            id = _ref8[0],
-            v = _ref8[1];
-
-        return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getVariableCyJSON"])(id, v.variableType, id);
-      }));
-      cy.add(factors.map(function (_ref9) {
-        var _ref10 = _slicedToArray(_ref9, 2),
-            id = _ref10[0],
-            f = _ref10[1];
-
-        return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorCyJSON"])(id);
-      }));
-      cy.add(factors.map(function (_ref11) {
-        var _ref12 = _slicedToArray(_ref11, 2),
-            factorId = _ref12[0],
-            f = _ref12[1];
-
-        return Object.entries(f.inputs).map(function (_ref13) {
-          var _ref14 = _slicedToArray(_ref13, 2),
-              inputId = _ref14[0],
-              variableId = _ref14[1];
-
-          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorInputCyJSON"])(inputId, factorId);
-        });
-      }).flat());
-      cy.add(factors.map(function (_ref15) {
-        var _ref16 = _slicedToArray(_ref15, 2),
-            factorId = _ref16[0],
-            f = _ref16[1];
-
-        return Object.entries(f.outputs).map(function (_ref17) {
-          var _ref18 = _slicedToArray(_ref17, 2),
-              outputId = _ref18[0],
-              variableId = _ref18[1];
-
-          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorOutputCyJSON"])(outputId, factorId);
-        });
-      }).flat());
-      cy.add(factors.map(function (_ref19) {
-        var _ref20 = _slicedToArray(_ref19, 2),
-            factorId = _ref20[0],
-            f = _ref20[1];
-
-        return Object.entries(f.inputs).map(function (_ref21) {
-          var _ref22 = _slicedToArray(_ref21, 2),
-              inputId = _ref22[0],
-              variableId = _ref22[1];
-
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(variableId, inputId);
-        });
-      }).flat());
-      cy.add(factors.map(function (_ref23) {
-        var _ref24 = _slicedToArray(_ref23, 2),
-            factorId = _ref24[0],
-            f = _ref24[1];
-
-        return Object.entries(f.outputs).map(function (_ref25) {
-          var _ref26 = _slicedToArray(_ref25, 2),
-              outputId = _ref26[0],
-              variableId = _ref26[1];
-
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(outputId, variableId);
-        });
-      }).flat());
+      var elementsCyJSON = JSON.parse(json);
+      cy.json({
+        elements: elementsCyJSON
+      });
+      /*
+      const nodes = Object.entries(nodeMap)
+      const loadTypes = [NODE_TYPES.VARIABLE, NODE_TYPES.FACTOR];
+      const [variables, factors] = loadTypes.map(
+        loadType => nodes.filter(([k, v]) => v.type == loadType)
+      );
+      
+      cy.add(variables.map(([id, v]) => getVariableCyJSON(id, v.variableType, id)));
+            cy.add(factors.map(([id, f]) => getFactorCyJSON(id)));
+       cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
+        .map(([inputId, variableId]) => getFactorInputCyJSON(
+          inputId,
+          factorId,
+        ))
+      ).flat());
+       cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
+        .map(([outputId, variableId]) => getFactorOutputCyJSON(
+          outputId,
+          factorId,
+        ))
+      ).flat());      
+       cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
+        .map(([inputId, variableId]) => getEdgeCyJSON(variableId, inputId))
+      ).flat());
+       cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
+        .map(([outputId, variableId]) => getEdgeCyJSON(outputId, variableId))
+      ).flat());
+      */
     }
   };
   return {
