@@ -55841,7 +55841,9 @@ var EDITOR_MODES = {
 };
 var NODE_TYPES = {
   VARIABLE: 'VARIABLE',
-  FACTOR: 'FACTOR'
+  FACTOR: 'FACTOR',
+  FACTOR_INPUT: 'FACTOR_INPUT',
+  FACTOR_OUTPUT: 'FACTOR_OUTPUT'
 };
 var VARIABLE_TYPES = {
   LATENT: 'LATENT',
@@ -55870,6 +55872,8 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 /*
  * Builds the command list for each context menu 
@@ -55878,28 +55882,27 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
  */
 
 function buildCommandLists(cy, commands, mode) {
-  var coreBase = [// layoutCommand,
-    // directedSwitchCommand(isDirected),
-    // tikzCommand
-  ];
+  var _ref;
+
   var queryNodeCommand = commands.queryNodeCommand,
       latentNodeCommand = commands.latentNodeCommand,
       evidenceNodeCommand = commands.evidenceNodeCommand,
       factorNodeCommand = commands.factorNodeCommand,
+      addInputCommand = commands.addInputCommand,
+      addOutputCommand = commands.addOutputCommand,
       edgeCommand = commands.edgeCommand,
       rmCommand = commands.rmCommand,
       setLatentCommand = commands.setLatentCommand,
       setEvidenceCommand = commands.setEvidenceCommand,
       setQueryCommand = commands.setQueryCommand,
       exportJSONCommand = commands.exportJSONCommand,
+      importJSONCommand = commands.importJSONCommand,
       layoutCommand = commands.layoutCommand;
+  var nodeBase = [edgeCommand, rmCommand];
 
   switch (mode) {
     case _constants__WEBPACK_IMPORTED_MODULE_0__["EDITOR_MODES"].EDIT:
-      return {
-        'node': [edgeCommand, rmCommand, setLatentCommand, setEvidenceCommand, setQueryCommand],
-        'core': coreBase.concat([layoutCommand, latentNodeCommand, factorNodeCommand, exportJSONCommand])
-      };
+      return _ref = {}, _defineProperty(_ref, "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]"), nodeBase.concat([setLatentCommand, setEvidenceCommand, setQueryCommand])), _defineProperty(_ref, "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]"), nodeBase.concat([addInputCommand, addOutputCommand])), _defineProperty(_ref, "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]"), nodeBase), _defineProperty(_ref, "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]"), nodeBase), _defineProperty(_ref, 'core', [layoutCommand, latentNodeCommand, factorNodeCommand, importJSONCommand, exportJSONCommand]), _ref;
 
     default:
       throw "Invalid editor mode \"".concat(mode, "\".");
@@ -55918,14 +55921,15 @@ function contextMenuReducer(cy, commands, menus, mode) {
     menu.destroy();
   });
   var commandLists = buildCommandLists(cy, commands, mode);
-  return Object.entries(commandLists).map(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
-        selector = _ref2[0],
-        commands = _ref2[1];
+  return Object.entries(commandLists).map(function (_ref2) {
+    var _ref3 = _slicedToArray(_ref2, 2),
+        selector = _ref3[0],
+        commands = _ref3[1];
 
     return cy.cxtmenu({
       selector: selector,
-      commands: commands
+      commands: commands,
+      fillColor: 'rgba(255,255,255,0.25)'
     });
   });
   /*
@@ -55948,18 +55952,70 @@ function contextMenuReducer(cy, commands, menus, mode) {
 
 /***/ }),
 
-/***/ "./src/graphCommands.js":
-/*!******************************!*\
-  !*** ./src/graphCommands.js ***!
-  \******************************/
-/*! exports provided: default */
+/***/ "./src/factorCommands.js":
+/*!*******************************!*\
+  !*** ./src/factorCommands.js ***!
+  \*******************************/
+/*! exports provided: getFactorCyJSON, getFactorInputCyJSON, getFactorOutputCyJSON, makeFactor, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorCyJSON", function() { return getFactorCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorInputCyJSON", function() { return getFactorInputCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFactorOutputCyJSON", function() { return getFactorOutputCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeFactor", function() { return makeFactor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildGraphCommands; });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+var getFactorCyJSON = function getFactorCyJSON(name) {
+  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  return {
+    data: _objectSpread({
+      'name': name,
+      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR
+    }, id ? {
+      id: id
+    } : {})
+  };
+};
+var getFactorInputCyJSON = function getFactorInputCyJSON(name, parentFactorId) {
+  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  return {
+    data: _objectSpread({
+      'name': name,
+      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT,
+      'parent': parentFactorId
+    }, id ? {
+      id: id
+    } : {})
+  };
+};
+var getFactorOutputCyJSON = function getFactorOutputCyJSON(name, parentFactorId) {
+  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  return {
+    data: _objectSpread({
+      'name': name,
+      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT,
+      'parent': parentFactorId
+    }, id ? {
+      id: id
+    } : {})
+  };
+};
+function makeFactor(cy, getVariableName, position) {
+  var factor = cy.add(_objectSpread({}, getFactorCyJSON(getVariableName()), {
+    position: position
+  }));
+  var output = cy.add(_objectSpread({}, getFactorOutputCyJSON(getVariableName(), factor.id()), {
+    position: position
+  }));
+  return [factor, output];
+}
 function buildGraphCommands(cy, getVariableName) {
   /*
    * Creates a factor node 
@@ -55967,31 +56023,92 @@ function buildGraphCommands(cy, getVariableName) {
   var factorNodeCommand = {
     content: "Factor",
     select: function select(ele, ev) {
-      cy.add({
-        data: {
-          'name': 'factor',
-          'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR
-        },
-        position: ev.position
-      });
+      makeFactor(cy, getVariableName, ev.position);
     }
   };
+  var addInputCommand = {
+    content: "Add input",
+    select: function select(ele) {
+      var _ele$data = ele.data(),
+          id = _ele$data.id,
+          type = _ele$data.type;
+
+      if (type !== _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) return;
+      cy.add(getFactorInputCyJSON(getVariableName(), id));
+    }
+  };
+  var addOutputCommand = {
+    content: "Add output",
+    select: function select(ele) {
+      var _ele$data2 = ele.data(),
+          id = _ele$data2.id,
+          type = _ele$data2.type;
+
+      if (type !== _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) return;
+      cy.add(getFactorOutputCyJSON(getVariableName(), id));
+    }
+  };
+  return {
+    factorNodeCommand: factorNodeCommand,
+    addInputCommand: addInputCommand,
+    addOutputCommand: addOutputCommand
+  };
+}
+
+/***/ }),
+
+/***/ "./src/graphCommands.js":
+/*!******************************!*\
+  !*** ./src/graphCommands.js ***!
+  \******************************/
+/*! exports provided: getVariableCyJSON, getEdgeCyJSON, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getVariableCyJSON", function() { return getVariableCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getEdgeCyJSON", function() { return getEdgeCyJSON; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildGraphCommands; });
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+var getVariableCyJSON = function getVariableCyJSON(name, variableType) {
+  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  return {
+    data: _objectSpread({
+      name: name,
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE,
+      variableType: variableType
+    }, id ? {
+      id: id
+    } : {})
+  };
+};
+var getEdgeCyJSON = function getEdgeCyJSON(source, target) {
+  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  return {
+    data: _objectSpread({
+      source: source,
+      target: target
+    }, id ? {
+      id: id
+    } : {})
+  };
+};
+function buildGraphCommands(cy, getVariableName) {
   /*
    * Creates a node with the given type
    */
-
   var variableCommand = function variableCommand(variableType) {
     return {
       content: "".concat(variableType, " Node"),
       select: function select(ele, ev) {
-        cy.add({
-          data: {
-            'name': getVariableName(),
-            'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE,
-            'variableType': variableType
-          },
+        cy.add(_objectSpread({}, getVariableCyJSON(getVariableName(), variableType), {
           position: ev.position
-        });
+        }));
       }
     };
   };
@@ -56009,39 +56126,59 @@ function buildGraphCommands(cy, getVariableName) {
     return eh.disable();
   });
   cy.on('ehcomplete', function (e, source, target, added) {
-    if (source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR) {
+    if (!(source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE || source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT)) {
+      console.log("Edges only allowed from variables to factor inputs and from factor outputs to variables");
+      cy.remove(added);
+      return;
+    } // Remove other inputs to the target node
+
+
+    if (target.indegree() != 1) {
+      target.incomers().filter('edge').filter(function (edge) {
+        return edge.data().source !== source.id();
+      }).remove();
+    }
+    /*
+    if (
+      source.data().type === NODE_TYPES.FACTOR 
+      && target.data().type === NODE_TYPES.FACTOR 
+    ) {
       cy.remove(added);
       console.log("No edges allowed between factor nodes");
       return;
     }
-
-    if (source.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE && target.data().type === _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE) {
+     if (
+      source.data().type === NODE_TYPES.VARIABLE
+      && target.data().type === NODE_TYPES.VARIABLE 
+    ) {
       // insert a factor automatically if the user connects two variables
-      var factorPosition = added[0].midpoint();
+      const factorPosition = added[0].midpoint()
       cy.remove(added);
-      var newFactor = cy.add({
+      const newFactor = cy.add({
         group: 'nodes',
         position: factorPosition,
-        data: {
-          type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR,
-          name: 'factor'
-        }
+        data: { type: NODE_TYPES.FACTOR, name: 'factor' }
       });
-      cy.add([{
-        group: 'edges',
-        data: {
-          source: source.id(),
-          target: newFactor.id()
-        }
-      }, {
-        group: 'edges',
-        data: {
-          source: newFactor.id(),
-          target: target.id()
-        }
-      }]);
+      cy.add([
+        { group: 'edges',
+          data: {
+            source: source.id(),
+            target: newFactor.id(),
+          },
+        },
+        { group: 'edges',
+          data: {
+            source: newFactor.id(), 
+            target: target.id(),
+          },
+        },
+      ]);
+      cy.remove(added);
+      console.log("No edges allowed between two variable nodes");
       return;
     }
+    */
+
   });
   var edgeCommand = {
     content: 'Edge',
@@ -56064,7 +56201,6 @@ function buildGraphCommands(cy, getVariableName) {
     queryNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].QUERY),
     evidenceNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].EVIDENCE),
     latentNodeCommand: variableCommand(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].LATENT),
-    factorNodeCommand: factorNodeCommand,
     edgeCommand: edgeCommand,
     rmCommand: rmCommand
   };
@@ -56091,53 +56227,56 @@ __webpack_require__.r(__webpack_exports__);
 
 function getStyle(isDirected) {
   var style = [{
+    selector: 'node, edge',
+    style: {
+      'font-family': 'Courier, monospace',
+      'font-size': 8,
+      'border-color': '#D9A036',
+      'color': '#fff',
+      'background-color': 'rgba(0,0,0,0.0)',
+      'text-halign': 'center',
+      'text-valign': 'center',
+      'line-color': '#8C6723',
+      'curve-style': 'bezier',
+      'target-arrow-shape': 'triangle',
+      'target-arrow-color': '#8C6723'
+    }
+  }, {
+    selector: 'edge',
+    style: {
+      'width': 0.5
+    }
+  }, {
+    selector: 'node',
+    style: {
+      'border-width': '0.5',
+      'label': 'data(name)'
+    }
+  }, {
     selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]"),
     style: {
-      shape: 'ellipse',
-      'border-width': '2',
-      'background-color': 'white',
-      'label': function label(ele) {
-        return ele.data('name');
-      }
+      shape: 'ellipse'
     }
   }, {
     selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]"),
     style: {
       shape: 'square',
-      'border-width': '2',
-      'background-color': 'white',
-      'label': function label(ele) {
-        return ele.data('name');
-      }
+      'border-style': 'dashed'
+    }
+  }, {
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]"),
+    style: {
+      shape: 'square'
+    }
+  }, {
+    selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]"),
+    style: {
+      shape: 'square'
     }
   }, {
     selector: 'node[color]',
     style: {
       'border-color': 'data(color)'
-    }
-  }, {
-    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].EVIDENCE, "\"]"),
-    style: {
-      'background-color': 'grey'
-    }
-  }, {
-    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].LATENT, "\"]"),
-    style: {
-      'background-color': 'white'
-    }
-  }, {
-    selector: "node[variableType=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["VARIABLE_TYPES"].QUERY, "\"]"),
-    style: {
-      'background-color': 'blue'
-    }
-  }, {
-    selector: 'edge',
-    style: isDirected ? {
-      'curve-style': 'bezier',
-      'target-arrow-shape': 'triangle',
-      'target-arrow-color': 'grey'
-    } : {
-      'target-arrow-shape': 'none'
     }
   }];
   return style;
@@ -56171,6 +56310,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./variableTypeCommands */ "./src/variableTypeCommands.js");
 /* harmony import */ var _processCommands__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./processCommands */ "./src/processCommands.js");
 /* harmony import */ var _layoutCommands__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layoutCommands */ "./src/layoutCommands.js");
+/* harmony import */ var _factorCommands__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./factorCommands */ "./src/factorCommands.js");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56186,6 +56326,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_cxtmenu__WEBPACK_IMPORTED_MODULE_2___default.a);
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_dagre__WEBPACK_IMPORTED_MODULE_3___default.a);
 cytoscape__WEBPACK_IMPORTED_MODULE_0___default.a.use(cytoscape_edgehandles__WEBPACK_IMPORTED_MODULE_4___default.a);
+
 
 
 
@@ -56214,7 +56355,7 @@ var getVariableName = function getVariableName() {
   return "".concat(next).concat(variableNameIndex > 26 ? Math.floor(variableNameIndex / 26) : '');
 };
 
-var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"]];
+var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"], _factorCommands__WEBPACK_IMPORTED_MODULE_12__["default"]];
 var commands = builders.reduce(function (acc, builder) {
   return _objectSpread({}, builder(cy, getVariableName), acc);
 }, {});
@@ -56287,6 +56428,191 @@ function buildLayoutCommands(cy) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildProcessCommands; });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
+/* harmony import */ var _graphCommands__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./graphCommands */ "./src/graphCommands.js");
+/* harmony import */ var _factorCommands__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factorCommands */ "./src/factorCommands.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+
+
+function buildProcessCommands(cy) {
+  var exportJSONCommand = {
+    content: 'Export Graph JSON',
+    select: function select() {
+      // Todo: validity check for unique names, DAG (for now)
+      var variables = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]")).map(function (variableNode) {
+        return [variableNode.data().name, {
+          type: variableNode.data().type,
+          variableType: variableNode.data().variableType
+        }];
+      });
+      var factor_inc = 0;
+      var factors = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]")).map(function (factorNode) {
+        var children = factorNode.children();
+        var inputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]")).map(function (input) {
+          return [input.data().name, input.incomers().filter('node').map(function (incomer) {
+            return incomer.data().name;
+          })];
+        }).map(function (_ref) {
+          var _ref2 = _slicedToArray(_ref, 2),
+              k = _ref2[0],
+              v = _ref2[1];
+
+          return [k, v[0]];
+        }));
+        var outputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]")).map(function (output) {
+          return [output.data().name, output.outgoers().filter('node').map(function (outgoer) {
+            return outgoer.data().name;
+          })];
+        }));
+        return ["phi_".concat(factor_inc), {
+          type: factorNode.data().type,
+          inputs: inputs,
+          outputs: outputs
+        }];
+      });
+
+      var nodeMap = _toConsumableArray(variables).concat(_toConsumableArray(factors)).reduce(function (acc, _ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            name = _ref4[0],
+            node = _ref4[1];
+
+        return _objectSpread({}, acc, _defineProperty({}, name, node));
+      }, {});
+
+      var json = JSON.stringify(nodeMap);
+      document.getElementById('namer').value = json;
+    }
+  };
+  var importJSONCommand = {
+    content: 'Import graph JSON',
+    select: function select() {
+      cy.elements().remove();
+      var json = document.getElementById('namer').value;
+      var nodeMap = JSON.parse(json);
+      var nodes = Object.entries(nodeMap);
+      var loadTypes = [_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR];
+
+      var _loadTypes$map = loadTypes.map(function (loadType) {
+        return nodes.filter(function (_ref5) {
+          var _ref6 = _slicedToArray(_ref5, 2),
+              k = _ref6[0],
+              v = _ref6[1];
+
+          return v.type == loadType;
+        });
+      }),
+          _loadTypes$map2 = _slicedToArray(_loadTypes$map, 2),
+          variables = _loadTypes$map2[0],
+          factors = _loadTypes$map2[1];
+
+      cy.add(variables.map(function (_ref7) {
+        var _ref8 = _slicedToArray(_ref7, 2),
+            name = _ref8[0],
+            v = _ref8[1];
+
+        return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getVariableCyJSON"])(name, v.variableType, name);
+      }));
+      cy.add(factors.map(function (_ref9) {
+        var _ref10 = _slicedToArray(_ref9, 2),
+            name = _ref10[0],
+            f = _ref10[1];
+
+        return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorCyJSON"])(name, name);
+      }));
+      cy.add(factors.map(function (_ref11) {
+        var _ref12 = _slicedToArray(_ref11, 2),
+            name = _ref12[0],
+            f = _ref12[1];
+
+        return Object.entries(f.inputs).map(function (_ref13) {
+          var _ref14 = _slicedToArray(_ref13, 2),
+              inputName = _ref14[0],
+              variableName = _ref14[1];
+
+          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorInputCyJSON"])(inputName, name, inputName);
+        });
+      }).flat());
+      cy.add(factors.map(function (_ref15) {
+        var _ref16 = _slicedToArray(_ref15, 2),
+            name = _ref16[0],
+            f = _ref16[1];
+
+        return Object.entries(f.outputs).map(function (_ref17) {
+          var _ref18 = _slicedToArray(_ref17, 2),
+              outputName = _ref18[0],
+              variableName = _ref18[1];
+
+          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorOutputCyJSON"])(outputName, name, outputName);
+        });
+      }).flat());
+      cy.add(factors.map(function (_ref19) {
+        var _ref20 = _slicedToArray(_ref19, 2),
+            name = _ref20[0],
+            f = _ref20[1];
+
+        return Object.entries(f.inputs).map(function (_ref21) {
+          var _ref22 = _slicedToArray(_ref21, 2),
+              inputName = _ref22[0],
+              variableName = _ref22[1];
+
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(variableName, inputName);
+        });
+      }).flat());
+      cy.add(factors.map(function (_ref23) {
+        var _ref24 = _slicedToArray(_ref23, 2),
+            name = _ref24[0],
+            f = _ref24[1];
+
+        return Object.entries(f.outputs).map(function (_ref25) {
+          var _ref26 = _slicedToArray(_ref25, 2),
+              outputName = _ref26[0],
+              variableName = _ref26[1];
+
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(outputName, variableName);
+        });
+      }).flat());
+    }
+  };
+  return {
+    importJSONCommand: importJSONCommand,
+    exportJSONCommand: exportJSONCommand
+  };
+}
+;
+
+/***/ }),
+
+/***/ "./src/utils.js":
+/*!**********************!*\
+  !*** ./src/utils.js ***!
+  \**********************/
+/*! exports provided: arrayToObject */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayToObject", function() { return arrayToObject; });
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -56299,57 +56625,15 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+var arrayToObject = function arrayToObject(arr) {
+  return arr.reduce(function (acc, _ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        k = _ref2[0],
+        v = _ref2[1];
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-
-function buildProcessCommands(cy) {
-  var exportJSONCommand = {
-    content: 'Export Graph JSON',
-    select: function select() {
-      // Todo: validity check for unique names, DAG (for now)
-      var variables = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]")).map(function (variableNode) {
-        return [variableNode.data().name, {
-          type: 'variable',
-          variableType: variableNode.data().variableType
-        }];
-      });
-      var factors = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]")).map(function (factorNode) {
-        var inputs = factorNode.incomers().filter('node').map(function (inputNode) {
-          return inputNode.data().name;
-        });
-        var outputs = factorNode.outgoers().filter('node').map(function (outputNode) {
-          return outputNode.data().name;
-        });
-        return ["".concat(inputs.join(','), "=>").concat(outputs.join(',')), {
-          type: 'factor',
-          inputs: inputs,
-          outputs: outputs
-        }];
-      });
-
-      var nodeMap = _toConsumableArray(variables).concat(_toConsumableArray(factors)).reduce(function (acc, _ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            name = _ref2[0],
-            node = _ref2[1];
-
-        return _objectSpread({}, acc, _defineProperty({}, name, node));
-      }, {});
-
-      var json = JSON.stringify(nodeMap);
-      console.log(json);
-    }
-  };
-  return {
-    exportJSONCommand: exportJSONCommand
-  };
-}
-;
+    return _objectSpread({}, acc, _defineProperty({}, k, v));
+  }, {});
+};
 
 /***/ }),
 

@@ -1,4 +1,4 @@
-import { EDITOR_MODES } from './constants';
+import { EDITOR_MODES, NODE_TYPES } from './constants';
 
 /*
  * Builds the command list for each context menu 
@@ -6,41 +6,50 @@ import { EDITOR_MODES } from './constants';
  * format { selector: [commands] } 
  */
 function buildCommandLists(cy, commands, mode) {
-  var coreBase = [
-    // layoutCommand,
-    // directedSwitchCommand(isDirected),
-    // tikzCommand
-  ];
-  
   const {
     queryNodeCommand,
     latentNodeCommand,
     evidenceNodeCommand,
     factorNodeCommand,
+    addInputCommand,
+    addOutputCommand,
     edgeCommand,
     rmCommand,
     setLatentCommand,
     setEvidenceCommand,
     setQueryCommand,
     exportJSONCommand,
+    importJSONCommand,
     layoutCommand
   } = commands; 
+ 
+  var nodeBase = [
+    edgeCommand,
+    rmCommand,
+  ];
 
   switch (mode) {
     case EDITOR_MODES.EDIT:
       return {
-        'node': [
-          edgeCommand,
-          rmCommand,
+        [`node[type="${NODE_TYPES.VARIABLE}"]`]: [
+          ...nodeBase,
           setLatentCommand,
           setEvidenceCommand,
           setQueryCommand,
         ],
+        [`node[type="${NODE_TYPES.FACTOR}"]`]: [
+           ...nodeBase,
+           addInputCommand,
+           addOutputCommand,
+        ],
+
+        [`node[type="${NODE_TYPES.FACTOR_INPUT}"]`]: nodeBase,
+        [`node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`]: nodeBase,
         'core': [
-          ...coreBase,
           layoutCommand,
           latentNodeCommand,
           factorNodeCommand,
+          importJSONCommand,
           exportJSONCommand,
         ],
       }
@@ -61,7 +70,8 @@ export function contextMenuReducer(cy, commands, menus, mode) {
   return Object.entries(commandLists).map(
     ([selector, commands]) => cy.cxtmenu({
       selector,
-      commands
+      commands,
+      fillColor: 'rgba(255,255,255,0.25)',
     })
   );
    /*

@@ -1,23 +1,23 @@
 import { NODE_TYPES, VARIABLE_TYPES } from './constants';
 
-export default function buildGraphCommands(cy, getVariableName) {
+export const getVariableCyJSON = (name, variableType, id = null) => ({
+  data: {
+    name: name,
+    type: NODE_TYPES.VARIABLE, 
+    variableType: variableType,
+    ...(id ? { id } : {})
+  }, 
+});
 
-  /*
-   * Creates a factor node 
-   */
-  const factorNodeCommand = ({
-    content: `Factor`,
-    select: function(ele, ev) {
-      cy.add({
-        data: {
-          'name': 'factor',
-          'type': NODE_TYPES.FACTOR, 
-        }, 
-        position: ev.position
-      })
-    }
-  }) 
-  
+export const getEdgeCyJSON = (source, target, id = null) => ({
+  data: {
+    source,
+    target,
+    ...(id ? { id } : {})
+  }
+});
+
+export default function buildGraphCommands(cy, getVariableName) {
   /*
    * Creates a node with the given type
    */
@@ -25,13 +25,9 @@ export default function buildGraphCommands(cy, getVariableName) {
     content: `${variableType} Node`,
     select: function(ele, ev) {
       cy.add({
-        data: {
-          'name': getVariableName(),
-          'type': NODE_TYPES.VARIABLE, 
-          'variableType': variableType,
-        }, 
+        ...getVariableCyJSON(getVariableName(), variableType),
         position: ev.position
-      })
+      });
     }
   })
 
@@ -46,7 +42,24 @@ export default function buildGraphCommands(cy, getVariableName) {
   eh.disable()
   cy.on('ehstop', () => eh.disable())
   cy.on('ehcomplete', (e, source, target, added) => {
-    
+
+
+    if (!(
+      (source.data().type === NODE_TYPES.FACTOR_OUTPUT
+        && target.data().type === NODE_TYPES.VARIABLE)
+      || (source.data().type === NODE_TYPES.VARIABLE
+        && target.data().type === NODE_TYPES.FACTOR_INPUT)))
+    {
+      console.log("Edges only allowed from variables to factor inputs and from factor outputs to variables");
+      cy.remove(added);
+      return;
+    }
+
+    // Remove other inputs to the target node
+    if (target.indegree() != 1) {
+      target.incomers().filter('edge').filter(edge => edge.data().source !== source.id()).remove();
+    }
+    /*
     if (
       source.data().type === NODE_TYPES.FACTOR 
       && target.data().type === NODE_TYPES.FACTOR 
@@ -82,8 +95,11 @@ export default function buildGraphCommands(cy, getVariableName) {
           },
         },
       ]);
+      cy.remove(added);
+      console.log("No edges allowed between two variable nodes");
       return;
     }
+    */
 
   });
 
@@ -109,7 +125,6 @@ export default function buildGraphCommands(cy, getVariableName) {
     queryNodeCommand: variableCommand(VARIABLE_TYPES.QUERY),
     evidenceNodeCommand: variableCommand(VARIABLE_TYPES.EVIDENCE),
     latentNodeCommand: variableCommand(VARIABLE_TYPES.LATENT),
-    factorNodeCommand,
     edgeCommand,
     rmCommand
   }; 

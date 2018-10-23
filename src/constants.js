@@ -6,6 +6,8 @@ export const EDITOR_MODES = {
 export const NODE_TYPES = {
   VARIABLE: 'VARIABLE',
   FACTOR: 'FACTOR',
+  FACTOR_INPUT: 'FACTOR_INPUT',
+  FACTOR_OUTPUT: 'FACTOR_OUTPUT',
 };
 
 export const VARIABLE_TYPES = {

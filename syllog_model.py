@@ -127,37 +127,3 @@ class SyllogPyroModel(object):
                     return node_values[self.target]
 
         return node_values[self.target]
-    
-
-def get_gaussian_factors(factor_descriptions):
-    """
-    Gets univariate gaussian factor functions 
-    with mean (default 0) and variance(default 1) factors
-    """
-    factors = {
-        node: (lambda *params: 
-               torch.distributions.Normal(
-                0 if len(params) < 1 else params[0], 
-                1 if len(params) < 2 else params[1], 
-               ).sample()
-              )
-        for (node, parents)
-        in factor_descriptions.items()
-    }
-    return factors
-
-def get_diagonal_gaussian_factors(factor_descriptions):
-    """
-    Gets diagonal gaussian factor functions with unit variance
-    """
-    factors = {
-        node: (lambda *params: 
-               torch.distributions.Normal(
-                   torch.cat(params) if len(params) > 0 else torch.zeros(len(parents)), 
-                   torch.eye(len(parents)), 
-               ).sample()
-              )
-        for (node, parents)
-        in factor_descriptions.items()
-    }
-    return factors

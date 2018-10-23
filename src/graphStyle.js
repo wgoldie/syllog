@@ -7,49 +7,63 @@ import { NODE_TYPES, VARIABLE_TYPES } from './constants';
 export function getStyle(isDirected) {
   const style = [
     {
+      selector: 'node, edge',
+      style: {
+        'font-family': 'Courier, monospace',
+        'font-size': 8,
+        'border-color': '#D9A036',
+        'color': '#fff',
+        'background-color': 'rgba(0,0,0,0.0)',
+        'text-halign': 'center',
+        'text-valign': 'center',
+        'line-color': '#8C6723',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'target-arrow-color': '#8C6723',
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        'width': 0.5,
+      }
+    },
+    {
+      selector: 'node',
+      style: {
+        'border-width':'0.5',
+        'label': 'data(name)'
+      }
+    },
+    {
       selector: `node[type="${NODE_TYPES.VARIABLE}"]`,
       style: {
         shape: 'ellipse',
-        'border-width':'2',
-        'background-color': 'white',
-        'label': function(ele) {
-          return ele.data('name')
-        }
       }
     },
     {
       selector: `node[type="${NODE_TYPES.FACTOR}"]`,
       style: {
         shape: 'square',
-        'border-width':'2',
-        'background-color': 'white',
-        'label': function(ele) {
-          return ele.data('name')
-        }
+        'border-style': 'dashed',
+      }
+    },
+    {
+      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"]`,
+      style: {
+        shape: 'square',
+      }
+    },
+    {
+      selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
+      style: {
+        shape: 'square',
       }
     },
     {
       selector: 'node[color]',
       style: {'border-color':'data(color)'}
     },
-    {
-      selector: `node[variableType="${VARIABLE_TYPES.EVIDENCE}"]`,
-      style: {'background-color': 'grey'}
-    },
-    {
-      selector: `node[variableType="${VARIABLE_TYPES.LATENT}"]`,
-      style: {'background-color': 'white'}
-    },
-    {
-      selector: `node[variableType="${VARIABLE_TYPES.QUERY}"]`,
-      style: {'background-color': 'blue'}
-    },
-    {
-      selector: 'edge',
-      style: (isDirected ?
-      { 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'target-arrow-color': 'grey' }
-      : {'target-arrow-shape':'none'})
-    }
   ]
 
   return style;

@@ -20,6 +20,7 @@ import buildGraphCommands from './graphCommands';
 import buildVariableTypeCommands from './variableTypeCommands';
 import buildProcessCommands from './processCommands';
 import buildLayoutCommands from './layoutCommands';
+import buildFactorCommands from './factorCommands';
 
 // Init cytoscape graph library
 const cy = cytoscape({
@@ -43,7 +44,13 @@ const getVariableName = function() {
   return `${next}${variableNameIndex > 26 ? Math.floor(variableNameIndex/26) : ''}`
 }
 
-const builders = [buildGraphCommands, buildVariableTypeCommands, buildProcessCommands, buildLayoutCommands];
+const builders = [
+  buildGraphCommands,
+  buildVariableTypeCommands,
+  buildProcessCommands,
+  buildLayoutCommands,
+  buildFactorCommands
+];
 
 const commands = builders.reduce((acc, builder) => ({ ...builder(cy, getVariableName), ...acc }), {})
 var menus = contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
