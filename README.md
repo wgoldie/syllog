@@ -25,27 +25,27 @@ Factors with no inputs, on the other hand, are often computed: they are the init
 
 Todo (Editor):
 - [x] Import/export JSON
-- [] Validate before export
+- [ ] Validate before export
 - [x] Enforce unique variable names
-- [] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
+- [ ] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
 - [x] Generate variable names
 - [x] Variable namer
-- [] Swap between factor/DGM view
-- [] Factor layout rules
+- [ ] Swap between factor/DGM view
+- [ ] Factor layout rules
 - [x] Radial marking menus
-- [] Nested marking menus
-- [] D-separation preview
+- [ ] Nested marking menus
+- [ ] D-separation preview
 
 Todo (Pyro):
 - [x] Import JSON
-- [] Evidence/latent/target handling
+- [ ] Evidence/latent/target handling
 
 Todo (Overall):
-- [] Example models
-- [] Predefined factors (distributions, arithmetic, etc)
-- [] Plates
-- [] Factor definition JSON spec
-- [] UGM models 
+- [ ] Example models
+- [ ] Predefined factors (distributions, arithmetic, etc)
+- [ ] Plates
+- [ ] Factor definition JSON spec
+- [ ] UGM models 
 - [x] Pyro support
-- [] Edwin support
-- [] Stan support
+- [ ] Edwin support
+- [ ] Stan support
