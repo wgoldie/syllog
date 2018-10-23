@@ -1,19 +1,19 @@
 import { NODE_TYPES, VARIABLE_TYPES } from './constants';
+import uuidv4 from 'uuid/v4';
 
-export const getVariableCyJSON = (name, variableType, id = null) => ({
+export const getVariableCyJSON = (id, variableType) => ({
   data: {
-    name: name,
+    id,
     type: NODE_TYPES.VARIABLE, 
     variableType: variableType,
-    ...(id ? { id } : {})
   }, 
 });
 
-export const getEdgeCyJSON = (source, target, id = null) => ({
+export const getEdgeCyJSON = (source, target) => ({
   data: {
+    id: uuidv4(),
     source,
     target,
-    ...(id ? { id } : {})
   }
 });
 

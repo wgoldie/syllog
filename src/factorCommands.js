@@ -1,29 +1,26 @@
 import { NODE_TYPES, VARIABLE_TYPES } from './constants';
 
-export const getFactorCyJSON = (name, id = null) => ({
-    data: {
-      'name': name,
-      'type': NODE_TYPES.FACTOR,
-      ...(id ? { id } : {})
-    }, 
+export const getFactorCyJSON = (id) => ({
+  data: {
+    id,
+    type: NODE_TYPES.FACTOR,
+  }, 
 });
 
-export const getFactorInputCyJSON = (name, parentFactorId, id = null) => ({
-    data: {
-      'name': name,
-      'type': NODE_TYPES.FACTOR_INPUT,
-      'parent': parentFactorId,
-      ...(id ? { id } : {})
-    },
+export const getFactorInputCyJSON = (id, parentFactorId) => ({
+  data: {
+    id,
+    type: NODE_TYPES.FACTOR_INPUT,
+    parent: parentFactorId,
+  },
 });
 
-export const getFactorOutputCyJSON = (name, parentFactorId, id = null) => ({
-    data: {
-      'name': name,
-      'type': NODE_TYPES.FACTOR_OUTPUT,
-      'parent': parentFactorId,
-      ...(id ? { id } : {})
-    },
+export const getFactorOutputCyJSON = (id, parentFactorId) => ({
+  data: {
+    id,
+    'type': NODE_TYPES.FACTOR_OUTPUT,
+    'parent': parentFactorId,
+  },
 });
 
 

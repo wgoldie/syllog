@@ -55759,6 +55759,126 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/uuid/lib/bytesToUuid.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/bytesToUuid.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
+}
+
+module.exports = bytesToUuid;
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/lib/rng-browser.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/rng-browser.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
+    return rnds8;
+  };
+} else {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var rnds = new Array(16);
+
+  module.exports = function mathRNG() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/v4.js":
+/*!*********************************!*\
+  !*** ./node_modules/uuid/v4.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -55972,39 +56092,30 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-var getFactorCyJSON = function getFactorCyJSON(name) {
-  var id = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+var getFactorCyJSON = function getFactorCyJSON(id) {
   return {
-    data: _objectSpread({
-      'name': name,
-      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR
-    }, id ? {
-      id: id
-    } : {})
+    data: {
+      id: id,
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR
+    }
   };
 };
-var getFactorInputCyJSON = function getFactorInputCyJSON(name, parentFactorId) {
-  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+var getFactorInputCyJSON = function getFactorInputCyJSON(id, parentFactorId) {
   return {
-    data: _objectSpread({
-      'name': name,
-      'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT,
-      'parent': parentFactorId
-    }, id ? {
-      id: id
-    } : {})
+    data: {
+      id: id,
+      type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT,
+      parent: parentFactorId
+    }
   };
 };
-var getFactorOutputCyJSON = function getFactorOutputCyJSON(name, parentFactorId) {
-  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+var getFactorOutputCyJSON = function getFactorOutputCyJSON(id, parentFactorId) {
   return {
-    data: _objectSpread({
-      'name': name,
+    data: {
+      id: id,
       'type': _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT,
       'parent': parentFactorId
-    }, id ? {
-      id: id
-    } : {})
+    }
   };
 };
 function makeFactor(cy, getVariableName, position) {
@@ -56070,32 +56181,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getEdgeCyJSON", function() { return getEdgeCyJSON; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return buildGraphCommands; });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.js");
+/* harmony import */ var uuid_v4__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+/* harmony import */ var uuid_v4__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(uuid_v4__WEBPACK_IMPORTED_MODULE_1__);
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-var getVariableCyJSON = function getVariableCyJSON(name, variableType) {
-  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+var getVariableCyJSON = function getVariableCyJSON(id, variableType) {
   return {
-    data: _objectSpread({
-      name: name,
+    data: {
+      id: id,
       type: _constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE,
       variableType: variableType
-    }, id ? {
-      id: id
-    } : {})
+    }
   };
 };
 var getEdgeCyJSON = function getEdgeCyJSON(source, target) {
-  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   return {
-    data: _objectSpread({
+    data: {
+      id: uuid_v4__WEBPACK_IMPORTED_MODULE_1___default()(),
       source: source,
       target: target
-    }, id ? {
-      id: id
-    } : {})
+    }
   };
 };
 function buildGraphCommands(cy, getVariableName) {
@@ -56250,7 +56359,7 @@ function getStyle(isDirected) {
     selector: 'node',
     style: {
       'border-width': '0.5',
-      'label': 'data(name)'
+      'label': 'data(id)'
     }
   }, {
     selector: "node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]"),
@@ -56348,11 +56457,17 @@ cy.json({
 });
 var variableNameIndex = 0;
 var variableNames = 'abcdefghijklmnopqrstuvwxyz';
+var loop = variableNames.length;
 
 var getVariableName = function getVariableName() {
-  var next = variableNames[variableNameIndex % 26];
-  variableNameIndex += 1;
-  return "".concat(next).concat(variableNameIndex > 26 ? Math.floor(variableNameIndex / 26) : '');
+  var name = null;
+
+  while (!name || cy.getElementById(name).length > 0) {
+    name = "".concat(variableNames[variableNameIndex % loop]).concat(variableNameIndex > loop ? Math.floor(variableNameIndex / loop) : '');
+    variableNameIndex += 1;
+  }
+
+  return name;
 };
 
 var builders = [_graphCommands__WEBPACK_IMPORTED_MODULE_8__["default"], _variableTypeCommands__WEBPACK_IMPORTED_MODULE_9__["default"], _processCommands__WEBPACK_IMPORTED_MODULE_10__["default"], _layoutCommands__WEBPACK_IMPORTED_MODULE_11__["default"], _factorCommands__WEBPACK_IMPORTED_MODULE_12__["default"]];
@@ -56461,7 +56576,7 @@ function buildProcessCommands(cy) {
     select: function select() {
       // Todo: validity check for unique names, DAG (for now)
       var variables = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].VARIABLE, "\"]")).map(function (variableNode) {
-        return [variableNode.data().name, {
+        return [variableNode.id(), {
           type: variableNode.data().type,
           variableType: variableNode.data().variableType
         }];
@@ -56470,8 +56585,8 @@ function buildProcessCommands(cy) {
       var factors = cy.nodes("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR, "\"]")).map(function (factorNode) {
         var children = factorNode.children();
         var inputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_INPUT, "\"]")).map(function (input) {
-          return [input.data().name, input.incomers().filter('node').map(function (incomer) {
-            return incomer.data().name;
+          return [input.id(), input.incomers().filter('node').map(function (incomer) {
+            return incomer.id();
           })];
         }).map(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 2),
@@ -56481,11 +56596,11 @@ function buildProcessCommands(cy) {
           return [k, v[0]];
         }));
         var outputs = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["arrayToObject"])(children.filter("node[type=\"".concat(_constants__WEBPACK_IMPORTED_MODULE_0__["NODE_TYPES"].FACTOR_OUTPUT, "\"]")).map(function (output) {
-          return [output.data().name, output.outgoers().filter('node').map(function (outgoer) {
-            return outgoer.data().name;
+          return [output.id(), output.outgoers().filter('node').map(function (outgoer) {
+            return outgoer.id();
           })];
         }));
-        return ["phi_".concat(factor_inc), {
+        return [factorNode.id(), {
           type: factorNode.data().type,
           inputs: inputs,
           outputs: outputs
@@ -56494,10 +56609,10 @@ function buildProcessCommands(cy) {
 
       var nodeMap = _toConsumableArray(variables).concat(_toConsumableArray(factors)).reduce(function (acc, _ref3) {
         var _ref4 = _slicedToArray(_ref3, 2),
-            name = _ref4[0],
+            id = _ref4[0],
             node = _ref4[1];
 
-        return _objectSpread({}, acc, _defineProperty({}, name, node));
+        return _objectSpread({}, acc, _defineProperty({}, id, node));
       }, {});
 
       var json = JSON.stringify(nodeMap);
@@ -56528,68 +56643,68 @@ function buildProcessCommands(cy) {
 
       cy.add(variables.map(function (_ref7) {
         var _ref8 = _slicedToArray(_ref7, 2),
-            name = _ref8[0],
+            id = _ref8[0],
             v = _ref8[1];
 
-        return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getVariableCyJSON"])(name, v.variableType, name);
+        return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getVariableCyJSON"])(id, v.variableType, id);
       }));
       cy.add(factors.map(function (_ref9) {
         var _ref10 = _slicedToArray(_ref9, 2),
-            name = _ref10[0],
+            id = _ref10[0],
             f = _ref10[1];
 
-        return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorCyJSON"])(name, name);
+        return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorCyJSON"])(id);
       }));
       cy.add(factors.map(function (_ref11) {
         var _ref12 = _slicedToArray(_ref11, 2),
-            name = _ref12[0],
+            factorId = _ref12[0],
             f = _ref12[1];
 
         return Object.entries(f.inputs).map(function (_ref13) {
           var _ref14 = _slicedToArray(_ref13, 2),
-              inputName = _ref14[0],
-              variableName = _ref14[1];
+              inputId = _ref14[0],
+              variableId = _ref14[1];
 
-          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorInputCyJSON"])(inputName, name, inputName);
+          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorInputCyJSON"])(inputId, factorId);
         });
       }).flat());
       cy.add(factors.map(function (_ref15) {
         var _ref16 = _slicedToArray(_ref15, 2),
-            name = _ref16[0],
+            factorId = _ref16[0],
             f = _ref16[1];
 
         return Object.entries(f.outputs).map(function (_ref17) {
           var _ref18 = _slicedToArray(_ref17, 2),
-              outputName = _ref18[0],
-              variableName = _ref18[1];
+              outputId = _ref18[0],
+              variableId = _ref18[1];
 
-          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorOutputCyJSON"])(outputName, name, outputName);
+          return Object(_factorCommands__WEBPACK_IMPORTED_MODULE_3__["getFactorOutputCyJSON"])(outputId, factorId);
         });
       }).flat());
       cy.add(factors.map(function (_ref19) {
         var _ref20 = _slicedToArray(_ref19, 2),
-            name = _ref20[0],
+            factorId = _ref20[0],
             f = _ref20[1];
 
         return Object.entries(f.inputs).map(function (_ref21) {
           var _ref22 = _slicedToArray(_ref21, 2),
-              inputName = _ref22[0],
-              variableName = _ref22[1];
+              inputId = _ref22[0],
+              variableId = _ref22[1];
 
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(variableName, inputName);
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(variableId, inputId);
         });
       }).flat());
       cy.add(factors.map(function (_ref23) {
         var _ref24 = _slicedToArray(_ref23, 2),
-            name = _ref24[0],
+            factorId = _ref24[0],
             f = _ref24[1];
 
         return Object.entries(f.outputs).map(function (_ref25) {
           var _ref26 = _slicedToArray(_ref25, 2),
-              outputName = _ref26[0],
-              variableName = _ref26[1];
+              outputId = _ref26[0],
+              variableId = _ref26[1];
 
-          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(outputName, variableName);
+          return Object(_graphCommands__WEBPACK_IMPORTED_MODULE_2__["getEdgeCyJSON"])(outputId, variableId);
         });
       }).flat());
     }

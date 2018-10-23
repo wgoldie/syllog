@@ -38,10 +38,15 @@ cy.json({
 
 let variableNameIndex = 0;
 const variableNames = 'abcdefghijklmnopqrstuvwxyz'
+const loop = variableNames.length
 const getVariableName = function() {
-  const next = variableNames[variableNameIndex % 26]
-  variableNameIndex += 1
-  return `${next}${variableNameIndex > 26 ? Math.floor(variableNameIndex/26) : ''}`
+  let name = null;
+  while (!name || cy.getElementById(name).length > 0) {
+    name = `${variableNames[variableNameIndex % loop]}${variableNameIndex > loop ? Math.floor(variableNameIndex/loop) : ''}`
+    variableNameIndex += 1
+  }
+  
+  return name;
 }
 
 const builders = [

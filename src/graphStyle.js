@@ -32,7 +32,7 @@ export function getStyle(isDirected) {
       selector: 'node',
       style: {
         'border-width':'0.5',
-        'label': 'data(name)'
+        'label': 'data(id)'
       }
     },
     {

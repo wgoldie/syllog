@@ -8,7 +8,7 @@ export default function buildProcessCommands(cy) {
     select: function() {
       // Todo: validity check for unique names, DAG (for now)
       const variables = cy.nodes(`node[type="${NODE_TYPES.VARIABLE}"]`).map(variableNode => ([
-        variableNode.data().name,
+        variableNode.id(),
         {
           type: variableNode.data().type,
           variableType: variableNode.data().variableType,
@@ -20,8 +20,8 @@ export default function buildProcessCommands(cy) {
         const inputs = arrayToObject(
           children.filter(`node[type="${NODE_TYPES.FACTOR_INPUT}"]`)
           .map(input => [
-            input.data().name,
-            input.incomers().filter('node').map(incomer => incomer.data().name)
+            input.id(),
+            input.incomers().filter('node').map(incomer => incomer.id())
           ])
           .map(([k, v]) => [k, v[0]])
         );
@@ -29,13 +29,13 @@ export default function buildProcessCommands(cy) {
         const outputs = arrayToObject(
           children.filter(`node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`)
           .map(output => [
-            output.data().name,
-            output.outgoers().filter('node').map(outgoer => outgoer.data().name)
+            output.id(),
+            output.outgoers().filter('node').map(outgoer => outgoer.id())
           ])
         );
 
         return [
-          `phi_${factor_inc}`,
+          factorNode.id(),
           {
             type: factorNode.data().type,
             inputs,
@@ -44,7 +44,7 @@ export default function buildProcessCommands(cy) {
         ];
       });
 
-      const nodeMap = [...variables, ...factors].reduce((acc, [name, node]) => ({...acc, [name]: node }), {});
+      const nodeMap = [...variables, ...factors].reduce((acc, [id, node]) => ({...acc, [id]: node }), {});
       const json = JSON.stringify(nodeMap);
       document.getElementById('namer').value = json;
     }
@@ -63,32 +63,30 @@ export default function buildProcessCommands(cy) {
         loadType => nodes.filter(([k, v]) => v.type == loadType)
       );
       
-      cy.add(variables.map(([name, v]) => getVariableCyJSON(name, v.variableType, name)));
+      cy.add(variables.map(([id, v]) => getVariableCyJSON(id, v.variableType, id)));
      
-      cy.add(factors.map(([name, f]) => getFactorCyJSON(name, name)));
+      cy.add(factors.map(([id, f]) => getFactorCyJSON(id)));
 
-      cy.add(factors.map(([name, f]) => Object.entries(f.inputs)
-        .map(([inputName, variableName]) => getFactorInputCyJSON(
-          inputName,
-          name,
-          inputName
+      cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
+        .map(([inputId, variableId]) => getFactorInputCyJSON(
+          inputId,
+          factorId,
         ))
       ).flat());
 
-      cy.add(factors.map(([name, f]) => Object.entries(f.outputs)
-        .map(([outputName, variableName]) => getFactorOutputCyJSON(
-          outputName,
-          name,
-          outputName
+      cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
+        .map(([outputId, variableId]) => getFactorOutputCyJSON(
+          outputId,
+          factorId,
         ))
       ).flat());      
 
-      cy.add(factors.map(([name, f]) => Object.entries(f.inputs)
-        .map(([inputName, variableName]) => getEdgeCyJSON(variableName, inputName))
+      cy.add(factors.map(([factorId, f]) => Object.entries(f.inputs)
+        .map(([inputId, variableId]) => getEdgeCyJSON(variableId, inputId))
       ).flat());
 
-      cy.add(factors.map(([name, f]) => Object.entries(f.outputs)
-        .map(([outputName, variableName]) => getEdgeCyJSON(outputName, variableName))
+      cy.add(factors.map(([factorId, f]) => Object.entries(f.outputs)
+        .map(([outputId, variableId]) => getEdgeCyJSON(outputId, variableId))
       ).flat());
     }
   };
