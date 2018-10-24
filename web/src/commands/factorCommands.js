@@ -1,31 +1,32 @@
-import { NODE_TYPES, VARIABLE_TYPES } from './constants';
+import { NODE_TYPES, VARIABLE_TYPES } from "./constants";
 
-import uuidv4 from 'uuid/v4';
+import uuidv4 from "uuid/v4";
 
-export const getFactorCyJSON = (name) => ({
+export const getFactorCyJSON = name => ({
   data: {
     id: uuidv4(),
     name: name,
     type: NODE_TYPES.FACTOR,
-    factorFunction: "None",
-  }, 
+    factorFunction: "None"
+  }
 });
 
-export const getFactorContainersCyJSON = factorId => ([
+export const getFactorContainersCyJSON = factorId => [
   {
     data: {
       id: uuidv4(),
       type: NODE_TYPES.FACTOR_INPUT_CONTAINER,
-      parent: factorId,
-    },
-  }, {
+      parent: factorId
+    }
+  },
+  {
     data: {
       id: uuidv4(),
       type: NODE_TYPES.FACTOR_OUTPUT_CONTAINER,
-      parent: factorId,
+      parent: factorId
     }
   }
-])
+];
 
 export const getFactorInputCyJSON = (name, parentId, factorId) => ({
   data: {
@@ -33,8 +34,8 @@ export const getFactorInputCyJSON = (name, parentId, factorId) => ({
     name,
     type: NODE_TYPES.FACTOR_INPUT,
     parent: parentId,
-    factor: factorId,
-  },
+    factor: factorId
+  }
 });
 
 export const getFactorOutputCyJSON = (name, parentId, factorId) => ({
@@ -43,26 +44,29 @@ export const getFactorOutputCyJSON = (name, parentId, factorId) => ({
     name,
     type: NODE_TYPES.FACTOR_OUTPUT,
     parent: parentId,
-    factor: factorId,
-  },
+    factor: factorId
+  }
 });
 
-
-const factorInputForFactor = (name, factorEle) => (
-  (getFactorInputCyJSON(
+const factorInputForFactor = (name, factorEle) =>
+  getFactorInputCyJSON(
     name,
-    factorEle.children(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`).first().id(),
-    factorEle.id() 
-  ))
-);
+    factorEle
+      .children(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
+      .first()
+      .id(),
+    factorEle.id()
+  );
 
-const factorOutputForFactor = (name, factorEle) => (
-  (getFactorOutputCyJSON(
+const factorOutputForFactor = (name, factorEle) =>
+  getFactorOutputCyJSON(
     name,
-    factorEle.children(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`).first().id(),
-    factorEle.id() 
-  ))
-);
+    factorEle
+      .children(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
+      .first()
+      .id(),
+    factorEle.id()
+  );
 
 export function makeFactor(cy, getVariableName, position) {
   const factor = cy.add({
@@ -75,28 +79,27 @@ export function makeFactor(cy, getVariableName, position) {
   cy.add(factorOutputForFactor(getVariableName(), factor));
 }
 
-
 export default function buildGraphCommands(cy, getVariableName) {
   /*
    * Creates a factor node 
    */
-  const factorNodeCommand = ({
+  const factorNodeCommand = {
     content: `Factor`,
     select: function(ele, ev) {
       makeFactor(cy, getVariableName, ev.position);
     }
-  });
+  };
 
-  const addInputCommand = ({ 
+  const addInputCommand = {
     content: "Add input",
     select: function(ele) {
       const { id, type } = ele.data();
       if (type !== NODE_TYPES.FACTOR) return;
       cy.add(factorInputForFactor(getVariableName(), ele));
     }
-  });
+  };
 
-  const addOutputCommand = ({ 
+  const addOutputCommand = {
     content: "Add output",
     select: function(ele) {
       const { id, type } = ele.data();
@@ -104,8 +107,7 @@ export default function buildGraphCommands(cy, getVariableName) {
 
       cy.add(factorOutputForFactor(getVariableName(), ele));
     }
-  });
+  };
 
   return { factorNodeCommand, addInputCommand, addOutputCommand };
 }
- 

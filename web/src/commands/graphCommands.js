@@ -1,20 +1,20 @@
-import { NODE_TYPES, VARIABLE_TYPES } from './constants';
-import uuidv4 from 'uuid/v4';
+import { NODE_TYPES, VARIABLE_TYPES } from "./constants";
+import uuidv4 from "uuid/v4";
 
 export const getVariableCyJSON = (name, variableType) => ({
   data: {
     id: uuidv4(),
     name,
-    type: NODE_TYPES.VARIABLE, 
-    variableType: variableType,
-  }, 
+    type: NODE_TYPES.VARIABLE,
+    variableType: variableType
+  }
 });
 
 export const getEdgeCyJSON = (source, target) => ({
   data: {
     id: uuidv4(),
     source,
-    target,
+    target
   }
 });
 
@@ -22,7 +22,7 @@ export default function buildGraphCommands(cy, getVariableName) {
   /*
    * Creates a node with the given type
    */
-  const variableCommand = (variableType) => ({
+  const variableCommand = variableType => ({
     content: `${variableType} Node`,
     select: function(ele, ev) {
       cy.add({
@@ -30,8 +30,7 @@ export default function buildGraphCommands(cy, getVariableName) {
         position: ev.position
       });
     }
-  })
-
+  });
 
   /* 
    * Begins drawing a new edge at
@@ -39,19 +38,21 @@ export default function buildGraphCommands(cy, getVariableName) {
    * must first register some edge handle
    * behavior hooks.
    */
-  const eh = cy.edgehandles({})
-  eh.disable()
-  cy.on('ehstop', () => eh.disable())
-  cy.on('ehcomplete', (e, source, target, added) => {
-
-
-    if (!(
-      (source.data().type === NODE_TYPES.FACTOR_OUTPUT
-        && target.data().type === NODE_TYPES.VARIABLE)
-      || (source.data().type === NODE_TYPES.VARIABLE
-        && target.data().type === NODE_TYPES.FACTOR_INPUT)))
-    {
-      console.log("Edges only allowed from variables to factor inputs and from factor outputs to variables");
+  const eh = cy.edgehandles({});
+  eh.disable();
+  cy.on("ehstop", () => eh.disable());
+  cy.on("ehcomplete", (e, source, target, added) => {
+    if (
+      !(
+        (source.data().type === NODE_TYPES.FACTOR_OUTPUT &&
+          target.data().type === NODE_TYPES.VARIABLE) ||
+        (source.data().type === NODE_TYPES.VARIABLE &&
+          target.data().type === NODE_TYPES.FACTOR_INPUT)
+      )
+    ) {
+      console.log(
+        "Edges only allowed from variables to factor inputs and from factor outputs to variables"
+      );
       cy.remove(added);
       return;
     }
@@ -101,27 +102,26 @@ export default function buildGraphCommands(cy, getVariableName) {
       return;
     }
     */
-
   });
 
   const edgeCommand = {
-    content: 'Edge',
+    content: "Edge",
     select: function(ele) {
-      eh.enable()
-      eh.start(ele) 
+      eh.enable();
+      eh.start(ele);
     }
-  }
+  };
 
   /*
    * Removes the selected node
    */
   const rmCommand = {
-    content: 'Remove',
+    content: "Remove",
     select: function(ele) {
-      ele.descendants().remove()
-      ele.remove()
+      ele.descendants().remove();
+      ele.remove();
     }
-  }
+  };
 
   return {
     queryNodeCommand: variableCommand(VARIABLE_TYPES.QUERY),
@@ -129,5 +129,5 @@ export default function buildGraphCommands(cy, getVariableName) {
     latentNodeCommand: variableCommand(VARIABLE_TYPES.LATENT),
     edgeCommand,
     rmCommand
-  }; 
+  };
 }

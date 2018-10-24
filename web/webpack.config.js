@@ -1,25 +1,26 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
-  mode: 'development',
+  mode: "development",
   watch: true,
-  entry: './src/index.js',
+  entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'syllog.bundle.js'
+    path: path.resolve(__dirname, "dist"),
+    filename: "syllog.bundle.js"
   },
-  devtool: 'source-map',
+  devtool: "source-map",
   module: {
-    rules: [{
-      test: /\.m?js$/,
-      exclude: /(node_modules)/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-        },
+    rules: [
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"]
+          }
+        }
       }
-    }],
+    ]
   }
 };
-
