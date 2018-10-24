@@ -174,11 +174,11 @@ class SyllogPyroModel(object):
             if node['node_type'] == FACTOR:
                 # if we are at a factor, execute it on the inputs
                 factor_args = {
-                    node['node_name']: node_values[node['name']]
-                    for node in node.predecessors()
+                    pred['node_name']: node_values[pred['name']]
+                    for pred in node.predecessors()
                 }
 
-                factor_outputs = factor_fns[node['factor_fn']](**factor_args)
+                factor_outputs = factor_fns[node['factor_fn']](_name = node['node_name'], **factor_args)
 
                 for output in node.successors():
                     node_values[output['name']] = factor_outputs[output['node_name']]

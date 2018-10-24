@@ -36,13 +36,15 @@ Todo (Editor):
 - [x] Radial marking menus
 - [ ] Nested marking menus
 - [ ] D-separation preview
+- [ ] Insert factor from library
 
 Todo (Pyro):
 - [x] Import JSON
 - [ ] Evidence/latent/target handling
 
 Todo (Overall):
-- [ ] Allow orphaned nodes 
+- [x] Allow orphaned nodes 
+- [ ] Constant nodes
 - [ ] Example models
 - [x] Predefined factors (distributions, arithmetic, etc)
 - [ ] Library of predefined factors
