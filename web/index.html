@@ -1,0 +1,48 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta charset="utf-8"></meta>
+    <title>Syllog</title>
+</head>
+
+<style>
+    #cy {
+        width: 100%;
+        height: 90%;
+        position: absolute;
+        background-color: #000;
+        top: 0px;
+        left: 0px;
+        z-index: -100;
+    }
+    #namer {
+        width: 50%;
+        height: 10%;
+        position: absolute;
+        top: 90%;
+        left: 0px;
+    }
+    #export{
+        width: 25%;
+        height: 10%;
+        position: absolute;
+        top: 90%;
+        left: 50%;
+    }
+    #import{
+        width: 25%;
+        height: 10%;
+        position: absolute;
+        top: 90%;
+        left: 75%;
+    }
+</style>
+<body>
+    <div id="cy"></div>
+    <input type="text" id="namer">
+    <button type="button" id="export">Export</button>
+    <input type="file" id="import">
+    <script src="dist/syllog.bundle.js"></script>
+</body>

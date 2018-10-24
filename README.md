@@ -43,6 +43,7 @@ Todo (Editor):
 - [ ] Nested marking menus
 - [ ] D-separation preview
 - [ ] Insert factor from library
+- [ ] LaTeX text rendering
 
 Todo (Pyro):
 - [x] Import JSON
