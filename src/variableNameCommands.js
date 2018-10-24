@@ -33,5 +33,18 @@ export default function buildVariableNameCommands(cy) {
     }
   });
 
-  return { renameNodeCommand };
+  const selectFactorFunctionCommand = ({
+    content: 'Select Function',
+    select: function(ele) {
+      const {factorFunction, type} = ele.data();
+      if (type !== NODE_TYPES.FACTOR) { return; }
+      const rename = window.prompt(`Change factor function from ${factorFunction} to:`, factorFunction);
+
+      // If the user exits the dialog, do nothing
+      if (!rename) { return; }
+      ele.data('factorFunction', rename);
+    }
+  });
+
+  return { selectFactorFunctionCommand, renameNodeCommand };
 }

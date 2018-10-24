@@ -118,6 +118,7 @@ export default function buildGraphCommands(cy, getVariableName) {
   const rmCommand = {
     content: 'Remove',
     select: function(ele) {
+      ele.descendants().remove()
       ele.remove()
     }
   }

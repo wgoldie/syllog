@@ -47,6 +47,10 @@ export function getStyle(isDirected) {
         shape: 'square',
         'border-style': 'dashed',
         'text-valign': 'top',
+        'label': ele => {
+          const d = ele.data()
+          return `${d.factorFunction}:${d.name}`
+        }
       }
     },
     {

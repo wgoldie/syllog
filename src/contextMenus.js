@@ -22,6 +22,7 @@ function buildCommandLists(cy, commands, mode) {
     importJSONCommand,
     layoutCommand,
     renameNodeCommand,
+    selectFactorFunctionCommand,
   } = commands; 
  
   var nodeBase = [
@@ -42,7 +43,8 @@ function buildCommandLists(cy, commands, mode) {
         [`node[type="${NODE_TYPES.FACTOR}"]`]: [
            ...nodeBase,
            addInputCommand,
-           addOutputCommand,
+          addOutputCommand,
+          selectFactorFunctionCommand,
         ],
         'edge': [rmCommand],
         [`node[type="${NODE_TYPES.FACTOR_INPUT}"]`]: nodeBase,

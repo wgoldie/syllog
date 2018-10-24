@@ -23,11 +23,13 @@ class SyllogPyroModel(object):
         """
         Arguments:
             graph - an igraph model with the following vertex attributes:
+                name: unique ID (generally UUID)
+                node_name: string identifying each node for human readability
                 node_type: string in informal enum [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]
                 variable_type: string in informal enum [LATENT, EVIDENCE, QUERY], 
                  should be null if node_type is not VARIABLE
             The graph must also have the following properties:
-                - All nodes must have unique names
+                - All variables and factors must have unique names (inputs and outputs may share names)
                 - Each variable node have exactly one parent, which is a factor output
                 - Each factor input node must have exactly one parent, which is a variable node; 
                 and exactly one child, which is a factor node
@@ -39,6 +41,7 @@ class SyllogPyroModel(object):
         
         sort_idx = graph.topological_sorting()
         self.graph = graph
+        self.variable_name_to_id = { node['node_name']: node['name'] for node in graph.vs if node['node_type'] == VARIABLE}
         self.sort = graph.vs[sort_idx]['name']
         
     parsed_node_types = [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]
@@ -60,13 +63,15 @@ class SyllogPyroModel(object):
             if node['data']['type'] in SyllogPyroModel.parsed_node_types
         ]
         node_names_by_id = {node['id']: node['name'] for node in nodes}
+        """
         factors = [node['name'] 
                    for node in nodes 
                    if node['type'] == FACTOR]
-        factor_input_edges = [(node['name'], node_names_by_id[node['factor']]) 
+        """
+        factor_input_edges = [(node['id'], node['factor']) 
                               for node in nodes 
                               if node['type'] == FACTOR_INPUT]
-        factor_output_edges = [(node_names_by_id[node['factor']], node['name']) 
+        factor_output_edges = [(node['factor'], node['id']) 
                                for node in nodes 
                                if node['type'] == FACTOR_OUTPUT]
         graph = Graph(0, directed=True)
@@ -74,12 +79,14 @@ class SyllogPyroModel(object):
         for node in nodes:
             if node['type'] in SyllogPyroModel.parsed_node_types:
                 graph.add_vertex(
-                    name=node['name'], 
+                    name=node['id'], 
+                    node_name=node['name'],
                     node_type=node['type'], 
-                    variable_type=node.get('variableType', None)
+                    variable_type=node.get('variableType', None),
+                    factor_fn=node.get('factorFunction', None)
                 )
                 
-        graph.add_edges([(node_names_by_id[edge['data']['source']], node_names_by_id[edge['data']['target']]) 
+        graph.add_edges([(edge['data']['source'], edge['data']['target']) 
                          for edge in cyjson['edges']])
         graph.add_edges(factor_input_edges)
         graph.add_edges(factor_output_edges)
@@ -105,7 +112,7 @@ class SyllogPyroModel(object):
             - Filename: a .png filename valid for writing
         """
         ## todo check writable and .png, use dagre layout algorithm?
-        self.graph.vs['label'] = self.graph.vs['name']
+        self.graph.vs['label'] = self.graph.vs['node_name']
         self.graph.vs['shape'] = [SyllogPyroModel.shape_dict[node_type] 
                                   for node_type in self.graph.vs['node_type']]
         self.graph.vs['color'] = [SyllogPyroModel.color_dict.get(variable_type, 'white') 
@@ -122,27 +129,34 @@ class SyllogPyroModel(object):
         
         factor_vertices = {v['name']: v for v in self.graph.vs if v['node_type'] == FACTOR}
         factor_inputs = {
-            fn: [p['name'] for p in fv.predecessors()]
+            fn: [p['node_name'] for p in fv.predecessors()]
             for (fn, fv) in factor_vertices.items()
         }
         factor_outputs = {
-            fn: [s['name'] for s in fv.successors()]
+            fn: [s['node_name'] for s in fv.successors()]
             for (fn, fv) in factor_vertices.items()
         }
         
         factor_descriptions = {
-            factor_name: {
+            factor_vertex['node_name']: {
+                'fn': factor_vertex['factor_fn'],
                 'inputs': factor_inputs.get(factor_name, []),
                 'outputs': factor_outputs.get(factor_name, [])
             }
-            for factor_name in factor_vertices.keys()
+            for (factor_name, factor_vertex) in factor_vertices.items()
         }
 
         return factor_descriptions
 
-    def __call__(self, factor_fns):
+    def get_evidence_nodes(self):
+        evidence_nodes = [v['node_name'] for v in self.graph.vs if v['node_type'] == VARIABLE and len(v.predecessors()) < 1]
+        return evidence_nodes
+    
+    def __call__(self, evidence, factor_fns):
         """
         Arguments:
+        
+        evidence: a dict-like object of observations for evidence nodes
         
         factors: a dict-like object of sampling functions for each factor
         each of which receives the values of the factor's parent variables (if any exist)
@@ -151,32 +165,40 @@ class SyllogPyroModel(object):
         Returns: A dict-like object of all node values
         """
 
-        node_values = {}
+        node_values = {self.variable_name_to_id[variable_name]: variable_value for (variable_name, variable_value) in evidence.items()}
         factor_descriptions = self.get_factor_descriptions()
 
         # iterate through the topological sorting of the graph
         for name in self.sort:
             node = self.graph.vs.select(name_eq=name)[0]
-            
-            # if we are at a factor, execute it on the inputs
             if node['node_type'] == FACTOR:
+                # if we are at a factor, execute it on the inputs
                 factor_args = {
-                    input_name: node_values[input_name]
-                    for input_name in factor_descriptions[name]['inputs'] 
+                    node['node_name']: node_values[node['name']]
+                    for node in node.predecessors()
                 }
 
-                factor_outputs = factor_fns[name](**factor_args)
+                factor_outputs = factor_fns[node['factor_fn']](**factor_args)
 
                 for output in node.successors():
-                    output_name = output['name']
-                    node_values[output_name] = factor_outputs[output_name]
+                    node_values[output['name']] = factor_outputs[output['node_name']]
             else:
                 # if we are not at a factor, we must have a parent value already computed
                 # by the topological sort and the required graph properties
-                if not node_values.get(name, None):
-                    # TODO: define value reduction behavior (by stacking, etc)
-                    # if multiple parent nodes exist w/o intermediary factor
+                # TODO: define value reduction behavior (by stacking, etc)
+                # if multiple parent nodes exist w/o intermediary factor
+                pred = node.predecessors()
+                
+                if name in node_values.keys():
+                    continue
+                if len(pred) > 0:
                     node_values[name] = node_values[node.predecessors()[0]['name']]
-                    
+                    continue
+                raise Exception("Node has no parents and is not evidence, or graph sort is broken.")
 
-        return node_values
+        return {
+            variable_name: node_values[variable_id] 
+            for (variable_name, variable_id) 
+            in self.variable_name_to_id.items()
+            if not variable_name in evidence.keys()
+        }

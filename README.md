@@ -25,6 +25,7 @@ Factors with no inputs, on the other hand, are often computed: they are the init
 
 Todo (Editor):
 - [x] Import/export JSON
+- [ ] Save/load JSON flat file
 - [ ] Validate before export
 - [x] Enforce unique variable names
 - [x] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
@@ -41,8 +42,10 @@ Todo (Pyro):
 - [ ] Evidence/latent/target handling
 
 Todo (Overall):
+- [ ] Allow orphaned nodes 
 - [ ] Example models
-- [ ] Predefined factors (distributions, arithmetic, etc)
+- [x] Predefined factors (distributions, arithmetic, etc)
+- [ ] Library of predefined factors
 - [ ] Plates
 - [ ] Factor definition JSON spec
 - [ ] UGM models?

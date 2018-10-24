@@ -7,6 +7,7 @@ export const getFactorCyJSON = (name) => ({
     id: uuidv4(),
     name: name,
     type: NODE_TYPES.FACTOR,
+    factorFunction: "None",
   }, 
 });
 
