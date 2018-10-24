@@ -9,7 +9,7 @@ Syllog targets the following workflow:
 3. Load model into probabilistic programming library and perform inference
 
 The final step can be performed manually, using hand-coded factor definitions;
-or in a single shot, using a library of predefined, named factors.
+or in a single shot, using a library of predefined, named factor functions.
 
 ![](icecream.png)
 
@@ -24,7 +24,7 @@ various linting and formatting plugins (for development)
 
 # Use
 - Use `npx webpack` in `web` to build the editor
-- Serve `index.html` or similar page from a webserver - `cd web; python -m http.server` works well.
+- Serve `web/index.html` or similar page from a webserver - `cd web; python -m http.server` works well.
 - Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
 
 
@@ -61,7 +61,7 @@ It has the structure
 
 Each node in the factor graph is a variable, a factor, a factor input, or a factor output.
 
-The "data" key of each node type is described below:
+The "data" key of each element type is described below:
 
 ### Variables
 ```javascript
@@ -73,12 +73,12 @@ The "data" key of each node type is described below:
 }
 ```
 
-`"name"` must be unique within the scope of all variable and factor names.
-`"variableType"` must be one of `["LATENT", "EVIDENCE", "QUERY"]`.
+- `"name"` must be unique within the scope of all variable and factor names.
+- `"variableType"` must be one of `["LATENT", "EVIDENCE", "QUERY"]`.
 
-Latent nodes are for marginalizing over. 
-Evidence nodes will be conditioning over.
-Query nodes are computed. 
+Latent nodes will be marginalized out. 
+Evidence nodes will be conditioned over.
+Query nodes will be computed. 
 
 ### Factors
 ```javascript
@@ -111,7 +111,7 @@ Query nodes are computed.
 
 In general, all factors with a given factor function should
 have the same set of names for inputs and outputs.
-E.g., every Normal distribution factor will have inputs "sigma" and "mu" and output "Z".
+E.g., every Normal distribution factor will have two inputs named "sigma" and "mu" and one output named "Z".
 
 ### Factor Containers
 
@@ -141,8 +141,8 @@ It is expected that these nodes will be removed soon.
 
 Edges are specified for all connections between factor inputs, factor outputs, and variables.
 Note that edges are only valid from a factor output to a variable, and from a variable to a factor input.
-Furthermore, a variable or factor input may only have one incoming node.
-Variables and factor outputs may have several outgoing nodes (though this is redundant in the latter case).
+Furthermore, a variable or factor input may only have one incoming edge.
+Variables and factor outputs may have several outgoing edges (though this is redundant in the latter case).
 
 Reader applications are responsible for inferring the correct edges between factors and their input and output nodes. Each input node is connected to the factor node, and each factor node is connected to the output nodes for that factor.
 It is expected that the need for this inference will be removed soon.
@@ -150,7 +150,7 @@ It is expected that the need for this inference will be removed soon.
 ## FactorJSON
 
 The second data format is the specification of factor functions.
-The data has the rough structure 
+The data has the structure 
 
 ```javascript
 {
