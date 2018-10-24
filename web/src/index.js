@@ -32,7 +32,6 @@ const cy = cytoscape({
 // Default to directed graph
 cy.json({
   style: getStyle(),
-  // 'elements': [{ group: 'nodes', data: {id: 0}}]
 });
 
 let variableNameIndex = 0;
@@ -64,7 +63,7 @@ const commands = builders.reduce(
   {},
 );
 
-contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
+const menus = contextMenuReducer(cy, commands, [], EDITOR_MODES.EDIT);
 
 /*
 var menus = []

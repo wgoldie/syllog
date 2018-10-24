@@ -70,9 +70,7 @@ export default function getStyle() {
       },
     },
     {
-      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"],node[type="${
-        NODE_TYPES.FACTOR_OUTPUT
-      }"]`,
+      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"],node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
       style: {
         label: 'data(name)',
       },

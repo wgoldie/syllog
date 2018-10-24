@@ -4,7 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier-eslint \"src/**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "eslint-plugin-react": "^7.11.1",
     "prettier": "1.14.3",
     "prettier-eslint": "^8.8.2",
+    "prettier-eslint-cli": "^4.7.1",
     "webpack": "^4.21.0",
     "webpack-cli": "^3.1.2"
   },

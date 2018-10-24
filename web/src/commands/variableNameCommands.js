@@ -13,10 +13,7 @@ export default function buildVariableNameCommands(cy) {
       }
 
       // Check for name collisions in correct scope
-      if (
-        type === NODE_TYPES.FACTOR_INPUT
-        || type === NODE_TYPES.FACTOR_OUTPUT
-      ) {
+      if (type === NODE_TYPES.FACTOR_INPUT || type === NODE_TYPES.FACTOR_OUTPUT) {
         if (
           cy
             .nodes()

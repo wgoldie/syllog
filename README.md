@@ -19,7 +19,13 @@ Factors with no inputs, on the other hand, are often computed: they are the init
 
 ### Requirements:
 - Python: PyTorch, igraph
-- Javascript: webpack, babel, cytoscape, various cytoscape plugins (see `src/package.json`)
+- Javascript: webpack, babel, cytoscape, various cytoscape plugins (see `src/package.json`),
+various linting and formatting plugins (for development)
+
+### Use
+- Use `npx webpack` in `src` to build the editor
+- Serve `index.html` or similar page from a webserver - `cd src; python -m http.server` works well.
+- Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
 
 ## Progress
 

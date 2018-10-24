@@ -67,9 +67,9 @@ export default function contextMenuReducer(cy, commands, menus, mode) {
     menu.destroy();
   });
   const commandLists = buildCommandLists(cy, commands, mode);
-  return Object.entries(commandLists).map(([selector, cmds]) => cy.cxtmenu({
+  return Object.entries(commandLists).map(([selector, commandList]) => cy.cxtmenu({
     selector,
-    cmds,
+    commands: commandList,
     fillColor: 'rgba(255,255,255,0.25)',
   }));
 }
