@@ -1,9 +1,9 @@
 export default function buildLayoutCommands(cy) {
   const layoutCommand = {
-    content: "Relayout graph",
-    select: function() {
-      cy.layout({ name: "dagre" }).run();
-    }
+    content: 'Relayout graph',
+    select() {
+      cy.layout({ name: 'dagre' }).run();
+    },
   };
 
   return { layoutCommand };

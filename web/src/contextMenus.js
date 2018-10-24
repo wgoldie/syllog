@@ -1,15 +1,13 @@
-import { EDITOR_MODES, NODE_TYPES } from "./constants";
+import { EDITOR_MODES, NODE_TYPES } from './constants';
 
 /*
- * Builds the command list for each context menu 
+ * Builds the command list for each context menu
  * for the current mode. Returns an object of the
- * format { selector: [commands] } 
+ * format { selector: [commands] }
  */
 function buildCommandLists(cy, commands, mode) {
   const {
-    queryNodeCommand,
     latentNodeCommand,
-    evidenceNodeCommand,
     factorNodeCommand,
     addInputCommand,
     addOutputCommand,
@@ -22,10 +20,10 @@ function buildCommandLists(cy, commands, mode) {
     importJSONCommand,
     layoutCommand,
     renameNodeCommand,
-    selectFactorFunctionCommand
+    selectFactorFunctionCommand,
   } = commands;
 
-  var nodeBase = [edgeCommand, rmCommand, renameNodeCommand];
+  const nodeBase = [edgeCommand, rmCommand, renameNodeCommand];
 
   switch (mode) {
     case EDITOR_MODES.EDIT:
@@ -34,13 +32,13 @@ function buildCommandLists(cy, commands, mode) {
           ...nodeBase,
           setLatentCommand,
           setEvidenceCommand,
-          setQueryCommand
+          setQueryCommand,
         ],
         [`node[type="${NODE_TYPES.FACTOR}"]`]: [
           ...nodeBase,
           addInputCommand,
           addOutputCommand,
-          selectFactorFunctionCommand
+          selectFactorFunctionCommand,
         ],
         edge: [rmCommand],
         [`node[type="${NODE_TYPES.FACTOR_INPUT}"]`]: nodeBase,
@@ -50,11 +48,11 @@ function buildCommandLists(cy, commands, mode) {
           latentNodeCommand,
           factorNodeCommand,
           importJSONCommand,
-          exportJSONCommand
-        ]
+          exportJSONCommand,
+        ],
       };
     default:
-      throw `Invalid editor mode "${mode}".`;
+      throw Error(`Invalid editor mode "${mode}".`);
   }
 }
 
@@ -64,16 +62,14 @@ function buildCommandLists(cy, commands, mode) {
  * The previous context menu objects
  * must be provided for clean destruction and replacement.
  */
-export function contextMenuReducer(cy, commands, menus, mode) {
-  menus.forEach(function(menu) {
+export default function contextMenuReducer(cy, commands, menus, mode) {
+  menus.forEach((menu) => {
     menu.destroy();
   });
   const commandLists = buildCommandLists(cy, commands, mode);
-  return Object.entries(commandLists).map(([selector, commands]) =>
-    cy.cxtmenu({
-      selector,
-      commands,
-      fillColor: "rgba(255,255,255,0.25)"
-    })
-  );
+  return Object.entries(commandLists).map(([selector, cmds]) => cy.cxtmenu({
+    selector,
+    cmds,
+    fillColor: 'rgba(255,255,255,0.25)',
+  }));
 }
