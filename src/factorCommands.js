@@ -2,41 +2,44 @@ import { NODE_TYPES, VARIABLE_TYPES } from './constants';
 
 import uuidv4 from 'uuid/v4';
 
-export const getFactorCyJSON = (id) => ({
+export const getFactorCyJSON = (name) => ({
   data: {
-    id,
+    id: uuidv4(),
+    name: name,
     type: NODE_TYPES.FACTOR,
   }, 
 });
 
-export const getFactorContainersCyJSON = id => ([
+export const getFactorContainersCyJSON = factorId => ([
   {
     data: {
       id: uuidv4(),
       type: NODE_TYPES.FACTOR_INPUT_CONTAINER,
-      parent: id,
+      parent: factorId,
     },
   }, {
     data: {
       id: uuidv4(),
       type: NODE_TYPES.FACTOR_OUTPUT_CONTAINER,
-      parent: id,
+      parent: factorId,
     }
   }
 ])
 
-export const getFactorInputCyJSON = (id, parentId, factorId) => ({
+export const getFactorInputCyJSON = (name, parentId, factorId) => ({
   data: {
-    id,
+    id: uuidv4(),
+    name,
     type: NODE_TYPES.FACTOR_INPUT,
     parent: parentId,
     factor: factorId,
   },
 });
 
-export const getFactorOutputCyJSON = (id, parentId, factorId) => ({
+export const getFactorOutputCyJSON = (name, parentId, factorId) => ({
   data: {
-    id,
+    id: uuidv4(),
+    name,
     type: NODE_TYPES.FACTOR_OUTPUT,
     parent: parentId,
     factor: factorId,

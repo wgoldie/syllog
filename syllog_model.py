@@ -1,6 +1,7 @@
 import json
 import torch
 from igraph import Graph
+from igraph import plot as igraph_plot
 #from graph_tool.topology import is_DAG, topological_sort 
 
 LATENT = 'LATENT'
@@ -40,6 +41,7 @@ class SyllogPyroModel(object):
         self.graph = graph
         self.sort = graph.vs[sort_idx]['name']
         
+    parsed_node_types = [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]
     @classmethod 
     def from_cyjson(cls, cyjson_str):
         """
@@ -52,33 +54,37 @@ class SyllogPyroModel(object):
 
         """
         cyjson = json.loads(cyjson_str)
-        nodes = [node['data'] for node in cyjson['nodes']]
-        factors = [node['id'] 
+        nodes = [
+            node['data'] 
+            for node in cyjson['nodes']
+            if node['data']['type'] in SyllogPyroModel.parsed_node_types
+        ]
+        node_names_by_id = {node['id']: node['name'] for node in nodes}
+        factors = [node['name'] 
                    for node in nodes 
                    if node['type'] == FACTOR]
-        factor_input_edges = [(node['id'], node['factor']) 
+        factor_input_edges = [(node['name'], node_names_by_id[node['factor']]) 
                               for node in nodes 
                               if node['type'] == FACTOR_INPUT]
-        factor_output_edges = [(node['factor'], node['id']) 
+        factor_output_edges = [(node_names_by_id[node['factor']], node['name']) 
                                for node in nodes 
                                if node['type'] == FACTOR_OUTPUT]
         graph = Graph(0, directed=True)
         
         for node in nodes:
-            if node['type'] in [FACTOR, VARIABLE, FACTOR_INPUT, FACTOR_OUTPUT]:
+            if node['type'] in SyllogPyroModel.parsed_node_types:
                 graph.add_vertex(
-                    name=node['id'], 
+                    name=node['name'], 
                     node_type=node['type'], 
                     variable_type=node.get('variableType', None)
                 )
                 
-        graph.add_edges([(edge['data']['source'], edge['data']['target']) 
+        graph.add_edges([(node_names_by_id[edge['data']['source']], node_names_by_id[edge['data']['target']]) 
                          for edge in cyjson['edges']])
         graph.add_edges(factor_input_edges)
         graph.add_edges(factor_output_edges)
         return cls(graph)
     
-    """
     shape_dict = {
         FACTOR: 'rectangle',
         VARIABLE: 'circle',
@@ -91,7 +97,6 @@ class SyllogPyroModel(object):
         EVIDENCE: 'black',
         QUERY: 'green'
     }
-    """
     
     def plot_graph(self, filename):
         """
@@ -100,13 +105,13 @@ class SyllogPyroModel(object):
             - Filename: a .png filename valid for writing
         """
         ## todo check writable and .png, use dagre layout algorithm?
-        self.graph.vs['label'] = graph.vs['name']
+        self.graph.vs['label'] = self.graph.vs['name']
         self.graph.vs['shape'] = [SyllogPyroModel.shape_dict[node_type] 
-                                  for node_type in graph.vs['node_type']]
+                                  for node_type in self.graph.vs['node_type']]
         self.graph.vs['color'] = [SyllogPyroModel.color_dict.get(variable_type, 'white') 
-                                  for variable_type in graph.vs['variable_type']]
+                                  for variable_type in self.graph.vs['variable_type']]
         layout = self.graph.layout("kk")
-        plot(self.graph, filename, layout=layout)
+        igraph_plot(self.graph, filename, layout=layout)
     
     def get_factor_descriptions(self):
         """

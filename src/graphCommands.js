@@ -1,9 +1,10 @@
 import { NODE_TYPES, VARIABLE_TYPES } from './constants';
 import uuidv4 from 'uuid/v4';
 
-export const getVariableCyJSON = (id, variableType) => ({
+export const getVariableCyJSON = (name, variableType) => ({
   data: {
-    id,
+    id: uuidv4(),
+    name,
     type: NODE_TYPES.VARIABLE, 
     variableType: variableType,
   }, 

@@ -42,7 +42,10 @@ const variableNames = 'abcdefghijklmnopqrstuvwxyz'
 const loop = variableNames.length
 const getVariableName = function() {
   let name = null;
-  while (!name || cy.getElementById(name).length > 0) {
+  while (
+    !name
+    || cy.nodes().filter(`node[name="${name}"]`).length > 0
+  ) {
     name = `${variableNames[variableNameIndex % loop]}${variableNameIndex > loop ? Math.floor(variableNameIndex/loop) : ''}`
     variableNameIndex += 1
   }

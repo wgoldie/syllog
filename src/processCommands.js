@@ -7,10 +7,10 @@ export default function buildProcessCommands(cy) {
   const exportJSONCommand = {
     content: 'Export Graph JSON',
     select: function() {
-      const elementsCyJSON = cy.json().elements;
+      const elementsCyJSON = cy.json().elements || {};
       const exportJSON = {
-        nodes: elementsCyJSON.nodes.map(({ data }) => ({ data })),
-        edges: elementsCyJSON.edges.map(({ data }) => ({ data })),
+        nodes: (elementsCyJSON.nodes || []).map(({ data }) => ({ data })),
+        edges: (elementsCyJSON.edges || []).map(({ data }) => ({ data })),
       }
       document.getElementById('namer').value = JSON.stringify(exportJSON);
     }

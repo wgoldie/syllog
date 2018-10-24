@@ -27,7 +27,7 @@ Todo (Editor):
 - [x] Import/export JSON
 - [ ] Validate before export
 - [x] Enforce unique variable names
-- [ ] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
+- [x] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
 - [x] Generate variable names
 - [x] Variable namer
 - [ ] Swap between factor/DGM view
@@ -45,7 +45,5 @@ Todo (Overall):
 - [ ] Predefined factors (distributions, arithmetic, etc)
 - [ ] Plates
 - [ ] Factor definition JSON spec
-- [ ] UGM models 
+- [ ] UGM models?
 - [x] Pyro support
-- [ ] Edwin support
-- [ ] Stan support

@@ -32,7 +32,7 @@ export function getStyle(isDirected) {
       selector: 'node',
       style: {
         'border-width':'0.5',
-        'label': 'data(id)'
+        'label': 'data(name)'
       }
     },
     {
@@ -63,6 +63,12 @@ export function getStyle(isDirected) {
         shape: 'square',
         label: 'Inputs',
         'text-valign': 'top',
+      }
+    },
+    {
+      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"],node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
+      style: {
+        label: 'data(name)'
       }
     },
     {
