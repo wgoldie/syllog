@@ -22,11 +22,16 @@ In addition, it is a web-based tool appropriate for teaching and academic use.
 - Javascript: webpack, babel, cytoscape, various cytoscape plugins (see `web/package.json`),
 various linting and formatting plugins (for development)
 
-# Use
-- Use `npx webpack` in `web` to build the editor
+# Use (legacy webapp)
+- Use `yarn` to install dependencies
+- Use `npx webpack` in `web` to build the editor 
 - Serve `web/index.html` or similar page from a webserver - `cd web; python -m http.server` works well.
 - Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
 
+# Use (react app)
+- Use `yarn` to install dependencies
+- Use `yarn start` to serve the app
+- Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
 
 # Data formatting
 There are currently two data formats for Syllog, each JSON-based.
