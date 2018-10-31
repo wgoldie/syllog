@@ -1,0 +1,14 @@
+{ 
+  "extends": [
+    "airbnb"
+  ],
+  "env": {
+    "browser": true
+  },
+  "parser": "babel-eslint",
+  "plugins": ["babel", "react", "import", "jsx-a11y"],
+  "rules": {
+    "react/destructuring-assignment": "off",
+    "import/prefer-default-export": "off"
+  }
+}
