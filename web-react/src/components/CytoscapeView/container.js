@@ -1,8 +1,9 @@
 import React from 'react';
+import CytoscapeContext from '../../cytoscape/context';
 import Presentation from './presentation';
 import attachCytoscape from '../../cytoscape';
 
-class CytoscapeContainer extends React.Component {
+class CytoscapeViewContainer extends React.Component {
   constructor(props) {
     super(props);
     this.cyRef = React.createRef();
@@ -10,7 +11,8 @@ class CytoscapeContainer extends React.Component {
 
   componentDidMount() {
     const cyNode = this.cyRef.current;
-    attachCytoscape(cyNode);
+    const cy = attachCytoscape(cyNode);
+    this.context.setCy(cy);
   }
 
   render() {
@@ -19,4 +21,6 @@ class CytoscapeContainer extends React.Component {
   }
 }
 
-export default CytoscapeContainer;
+CytoscapeViewContainer.contextType = CytoscapeContext;
+
+export default CytoscapeViewContainer;
