@@ -1,20 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const CytoscapeElement = styled.div`
-width: 100%;
-height: 90%;
-position: absolute;
-background-color: #000;
-top: 0px;
-left: 0px;
-z-index: -100;
-`;
+import CytoscapeView from './components/CytoscapeView';
 
 const App = () => (
-  <CytoscapeElement>
-    <div id="cy" />
-  </CytoscapeElement>
+  <div>
+    <h1>Syllog</h1>
+    <CytoscapeView />
+  </div>
 );
 
 export default App;
