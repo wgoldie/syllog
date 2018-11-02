@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import InternalPropTypes from '../../constants/InternalPropTypes';
 
+const pt = key => props => props.theme[key];
+
 const Wrapper = styled.ul`
 display: flex;
 justify-content: flex-start;
@@ -13,6 +15,10 @@ width: 100%;
 height: 100%;
 overflow-y: hidden;
 overflow-x: scroll;
+background-color: ${pt('background')};
+color: ${pt('color')};
+border-color: ${pt('border')};
+border-top: 1px solid;
 `;
 
 const Factor = styled.li`
@@ -23,7 +29,7 @@ overflow-x: hidden;
 overflow-y: scroll;
 height: 100%;
 width: 200px;
-border: 1px solid #000;
+border: 1px ${pt('altBorderStyle')} ${pt('border')};
 border-radius: 5px;
 padding: 10px;
 margin: 10px;
@@ -31,25 +37,24 @@ margin: 10px;
 
 const FactorName = styled.span`
 display: block;
-background: #000;
-color: #fff;
+background: ${pt('altBackground')};
+color: ${pt('altColor')};
 left: 5px;
 border-top-right-radius: 5px;
 border-top-left-radius: 5px;
-border: 1px solid #000;
+border: 1px solid ${pt('altBorder')};
 padding: 5px;
 `;
 
 const FactorFieldsetWrapper = styled.div`
 display: block;
-border: 1px solid #000;
+border: 1px solid ${pt('border')};
 padding: 5px;
 margin: 5px 0;
 `;
 
 const FactorFieldsetName = styled.span`
 display: block;
-text-decoration: underline;
 margin: 5px;
 `;
 
@@ -62,11 +67,11 @@ flex-wrap: wrap;
 const FactorField = styled.div`
 margin: 5px;
 display: inline-block;
-border: 1px solid #000;
+border: 1px solid ${pt('border')};
 padding: 5px;
 &:hover {
-  background: #000;
-  color: #fff;
+  background: ${pt('altHoverBackground')};
+  color: ${pt('altHoverColor')};
 }
 `;
 
@@ -77,12 +82,12 @@ display: block;
 background: none;
 border-radius: 0;
 &:hover {
-  background: #999;
+  background: ${pt('hoverBackground')};
   cursor: pointer;
 }
 highlight: none;
-border: 1px solid #000;
-color: #000;
+border: 1px solid ${pt('border')};
+color: ${pt('color')};
 `;
 
 const FactorFieldset = ({ title, fields }) => (
