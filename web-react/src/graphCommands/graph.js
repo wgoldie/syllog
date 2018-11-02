@@ -22,7 +22,10 @@ const checkEdgeValid = cy => (e, source, target, added) => {
     !(
       (source.data().type === NODE_TYPES.FACTOR_OUTPUT
         && target.data().type === NODE_TYPES.VARIABLE)
-      || (source.data().type === NODE_TYPES.VARIABLE && target.data().type === NODE_TYPES.FACTOR_INPUT)
+      || (
+        source.data().type === NODE_TYPES.VARIABLE
+        && target.data().type === NODE_TYPES.FACTOR_INPUT
+      )
     )
   ) {
     console.log(

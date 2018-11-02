@@ -1,10 +1,6 @@
 import React from 'react';
-
 import ContextMenu from '../ContextMenu';
-
-import CytoscapeContext from '../../cytoscape/context';
 import { NODE_TYPES } from '../../constants/cytoscape';
-
 import { drawEdge, rmElement, addLatent } from '../../graphCommands/graph';
 import { renameNode, selectFactorFunction } from '../../graphCommands/variableNameCommands';
 import { addFactorInput, addFactorOutput, addFactor } from '../../graphCommands/factorCommands';

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
-import CytoscapeContext from '../../cytoscape/context';
+import { CytoscapeContext } from 'react-cytoscape-tools';
 
 class ContextMenu extends React.Component {
   constructor(props) {
