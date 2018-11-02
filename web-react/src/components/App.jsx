@@ -2,6 +2,7 @@ import React from 'react';
 import { CytoscapeView, CytoscapeGate, CytoscapeProvider } from 'react-cytoscape-tools';
 import styled from 'styled-components';
 import EditModeMenus from './EditModeMenus';
+import FactorLibrary from './FactorLibrary';
 import getStyle from '../cytoscape/style';
 import configureCytoscapeLibrary from '../cytoscape';
 
@@ -41,14 +42,21 @@ font-size: 300%;
 flex: 1;
 `;
 
+const FactorWrapper = styled.div`
+flex: 5;
+position: relative;
+overflow: hidden;
+width: 100%;
+`;
+
 const cytoscapeLibrary = configureCytoscapeLibrary();
 const cytoscapeStyle = getStyle();
 
 const App = () => (
   <AppWrapper>
-    <AppHeader>Syllog</AppHeader>
-    <CyWrapper>
-      <CytoscapeProvider>
+    <CytoscapeProvider>
+      <AppHeader>Syllog</AppHeader>
+      <CyWrapper>
         <CytoscapeView
           style={cyElementStyle}
           cyInitJSON={{ style: cytoscapeStyle }}
@@ -57,8 +65,11 @@ const App = () => (
         <CytoscapeGate>
           <EditModeMenus />
         </CytoscapeGate>
-      </CytoscapeProvider>
-    </CyWrapper>
+      </CyWrapper>
+      <FactorWrapper>
+        <FactorLibrary />
+      </FactorWrapper>
+    </CytoscapeProvider>
   </AppWrapper>
 );
 

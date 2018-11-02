@@ -36,12 +36,12 @@ export const edgeCyJSON = (source, target) => ({
  *
  * Should be inserted along with factorContainersCyJSON
  */
-export const factorCyJSON = name => ({
+export const factorCyJSON = (name, factorFunction = 'None') => ({
   data: {
     id: uuidv4(),
     name,
     type: NODE_TYPES.FACTOR,
-    factorFunction: 'None',
+    factorFunction,
   },
 });
 
@@ -84,3 +84,50 @@ export const factorChildCyJSON = (name, parentId, factorId, childType) => ({
     factor: factorId,
   },
 });
+
+/*
+ * Helper to produce CyJSON for
+ * a factor's input with the given name.
+ */
+export const factorInputForFactor = (name, factorEle) => factorChildCyJSON(
+  name,
+  factorEle
+    .children(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
+    .first()
+    .id(),
+  factorEle.id(),
+  NODE_TYPES.FACTOR_INPUT,
+);
+
+/*
+ * Helper to produce CyJSON for
+ * a factor's output with the given name.
+ */
+export const factorOutputForFactor = (name, factorEle) => factorChildCyJSON(
+  name,
+  factorEle
+    .children(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
+    .first()
+    .id(),
+  factorEle.id(),
+  NODE_TYPES.FACTOR_OUTPUT,
+);
+
+/*
+ * Builds a factor with input and output containers
+ * and adds it to the graph.
+ *
+ * getVariableName must provide a unique name for the factor
+ *
+ * position is optional (format { x, y })
+ * and will place the factor spatially
+ */
+export function makeFactor(cy, getVariableName, position = {}) {
+  const factor = cy.add({
+    ...factorCyJSON(getVariableName()),
+    position,
+  });
+
+  cy.add(factorContainersCyJSON(factor.id()));
+  cy.add(factorOutputForFactor(getVariableName(), factor));
+}

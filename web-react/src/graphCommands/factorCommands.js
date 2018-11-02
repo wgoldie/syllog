@@ -1,39 +1,13 @@
 import { NODE_TYPES } from '../constants/cytoscape';
-import { factorChildCyJSON, factorContainersCyJSON, factorCyJSON } from '../cytoscape/cyJSONBuilders';
-
-const factorInputForFactor = (name, factorEle) => factorChildCyJSON(
-  name,
-  factorEle
-    .children(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
-    .first()
-    .id(),
-  factorEle.id(),
-  NODE_TYPES.FACTOR_INPUT,
-);
-
-const factorOutputForFactor = (name, factorEle) => factorChildCyJSON(
-  name,
-  factorEle
-    .children(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
-    .first()
-    .id(),
-  factorEle.id(),
-  NODE_TYPES.FACTOR_OUTPUT,
-);
-
-export function makeFactor(cy, getVariableName, position) {
-  const factor = cy.add({
-    ...factorCyJSON(getVariableName()),
-    position,
-  });
-
-  cy.add(factorContainersCyJSON(factor.id()));
-  cy.add(factorOutputForFactor(getVariableName(), factor));
-}
+import {
+  makeFactor,
+  factorInputForFactor,
+  factorOutputForFactor,
+} from '../cytoscape/cyJSONBuilders';
 
 /*
-   * Creates a factor node
-   */
+ * Creates a factor node
+ */
 export const addFactor = (cy, getVariableName) => ({
   content: 'Factor',
   select(ele, ev) {
