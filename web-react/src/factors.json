@@ -1,0 +1,18 @@
+{
+ "NormalPDF": {
+   "inputs": ["mu", "sigma"],
+   "outputs": ["z"]
+  },
+ "PoissonPDF": {
+   "inputs": ["lambda"],
+   "outputs": ["x"]
+  },
+ "BernoulliPDF": {
+   "inputs": ["p"],
+   "outputs": ["x"]
+  },
+ "GammaPDF": {
+   "inputs": ["k", "theta"],
+   "outputs": ["x"]
+  }
+}

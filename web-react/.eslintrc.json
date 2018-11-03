@@ -10,6 +10,7 @@
   "rules": {
     "react/sort-comp": "off",
     "react/destructuring-assignment": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "consistent-return": "off"
   }
 }

@@ -31,10 +31,15 @@ const AppWrapper = styled.div`
 height: 100%;
 overflow: hidden;
 display: flex;
-flex-direction: column;
+flex-direction: row;
 `;
 
 const AppHeader = styled.h1`
+position: fixed;
+top: 0;
+left: 0;
+width: 300px;
+height: 100px;
 display: flex;
 justify-content: space-around;
 align-items: center;
@@ -43,15 +48,25 @@ font-size: 300%;
 flex: 1;
 background: ${props => props.theme.background};
 color: ${props => props.theme.color};
-border-bottom: 1px solid ${props => props.theme.border};
+border-color: ${props => props.theme.border};
+border-right: 1px solid;
+border-bottom: 1px solid; 
 padding: 30px;
+z-index: 500;
 `;
 
 const FactorWrapper = styled.div`
-flex: 5;
+min-width: 250px;
+flex: 1;
 position: relative;
 overflow: hidden;
-width: 100%;
+height: 100%;
+`;
+
+const MainColumn = styled.div`
+flex: 5 1;
+display: flex;
+flex-direction: column;
 `;
 
 const cytoscapeLibrary = configureCytoscapeLibrary();
@@ -60,18 +75,20 @@ const cytoscapeStyle = getStyle();
 const App = () => (
   <ThemeProvider theme={theme}>
     <AppWrapper>
+      <AppHeader>Syllog</AppHeader>
       <CytoscapeProvider>
-        <AppHeader>Syllog</AppHeader>
-        <CyWrapper>
-          <CytoscapeView
-            style={cyElementStyle}
-            cyInitJSON={{ style: cytoscapeStyle }}
-            cytoscape={cytoscapeLibrary}
-          />
-          <CytoscapeGate>
-            <EditModeMenus />
-          </CytoscapeGate>
-        </CyWrapper>
+        <MainColumn>
+          <CyWrapper>
+            <CytoscapeView
+              style={cyElementStyle}
+              cyInitJSON={{ style: cytoscapeStyle }}
+              cytoscape={cytoscapeLibrary}
+            />
+            <CytoscapeGate>
+              <EditModeMenus />
+            </CytoscapeGate>
+          </CyWrapper>
+        </MainColumn>
         <FactorWrapper>
           <FactorLibrary />
         </FactorWrapper>
