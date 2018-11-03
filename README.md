@@ -185,12 +185,13 @@ Todo for 0.0.1:
 - [ ] Save/load JSON flat file
 - [x] Pyro support
 - [x] Predefined factors (distributions, arithmetic, etc)
-- [ ] Factor definition JSON spec
+- [x] Factor definition JSON spec
 - [ ] Copy factors in editor
 - [ ] Library of predefined factors for Pyro
-- [ ] Insert factor from library
+- [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
 - [ ] Export LaTeX graph
+- [ ] Remove factor containers
 
 Roadmap:
 - [ ] Validate before export

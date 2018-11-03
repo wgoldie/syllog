@@ -12,7 +12,7 @@ import theme from '../style/defaultTheme';
 const cyElementStyle = {
   width: '100%',
   position: 'absolute',
-  backgroundColor: '#000',
+  backgroundColor: theme.neutralBackground,
   top: 0,
   left: 0,
   right: 0,
@@ -48,6 +48,11 @@ font-size: 300%;
 flex: 1;
 background: ${props => props.theme.background};
 color: ${props => props.theme.color};
+&:hover {
+  background: ${props => props.theme.hoverBackground};
+  color: ${props => props.theme.hoverColor};
+  border-color: ${props => props.theme.hoverBorder};
+}
 border-color: ${props => props.theme.border};
 border-right: 1px solid;
 border-bottom: 1px solid; 
@@ -70,7 +75,7 @@ flex-direction: column;
 `;
 
 const cytoscapeLibrary = configureCytoscapeLibrary();
-const cytoscapeStyle = getStyle();
+const cytoscapeStyle = getStyle(theme);
 
 const App = () => (
   <ThemeProvider theme={theme}>

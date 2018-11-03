@@ -100,6 +100,7 @@ border-radius: 0;
 &:hover {
   background: ${pt('hoverBackground')};
   cursor: pointer;
+  color: ${pt('hoverColor')};
 }
 highlight: none;
 border: 1px solid ${pt('border')};
@@ -116,6 +117,7 @@ const buttonStyle = props => `
   padding: 10px;
   &:hover {
     background: ${pt('hoverBackground')(props)};
+    color: ${pt('hoverColor')(props)};
     cursor: pointer;
   }
   font-size: 100%;

@@ -4,22 +4,22 @@ import { NODE_TYPES } from '../constants/cytoscape';
  * Returns a json object that can be
  * provided to cytoscape as a style.
  */
-export default function getStyle() {
+export default function getStyle(theme) {
   const style = [
     {
       selector: 'node, edge',
       style: {
-        'font-family': 'Courier, monospace',
+        'font-family': 'Consolas, Courier, monospace',
         'font-size': 8,
-        'border-color': '#D9A036',
-        color: '#fff',
-        'background-color': 'rgba(0,0,0,0.0)',
+        'border-color': theme.border,
+        color: theme.color,
+        //'background-color': theme.neutralBackground,
         'text-halign': 'center',
         'text-valign': 'center',
-        'line-color': '#8C6723',
+        'line-color': theme.border,
         'curve-style': 'bezier',
         'target-arrow-shape': 'triangle',
-        'target-arrow-color': '#8C6723',
+        'target-arrow-color': theme.border,
       },
     },
     {
