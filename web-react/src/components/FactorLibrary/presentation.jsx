@@ -18,6 +18,7 @@ import {
   FactorsInput,
   FactorsInputLabel,
 } from './styles';
+import { jsonToBlob } from '../../utils/url';
 
 const FactorFieldset = ({ title, fields }) => (
   <FactorFieldsetWrapper>
@@ -38,7 +39,6 @@ FactorFieldset.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-const factorsToBlob = factorJSON => `data:text/json;charset=utf-8,${JSON.stringify(factorJSON, null, 2)}`;
 
 const FactorLibraryPresentation = ({
   loaderRef,
@@ -58,7 +58,7 @@ const FactorLibraryPresentation = ({
         />
       </FactorsInputLabel>
       <FactorsLink
-        href={factorsToBlob(factors)}
+        href={jsonToBlob(factors)}
         download="factors.json"
       >
         Export Factors

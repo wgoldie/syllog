@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const pt = key => props => props.theme[key];
 
 export const Wrapper = styled.div`
+flex: 1.5;
 height: 100%;
 overflow: hidden;
 background-color: ${pt('background')};
