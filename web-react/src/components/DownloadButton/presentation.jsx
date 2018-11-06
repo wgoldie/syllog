@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const DownloadButtonPresentation = ({
   children,
@@ -14,5 +15,12 @@ const DownloadButtonPresentation = ({
     {children}
   </button>
 );
+
+DownloadButtonPresentation.propTypes = {
+  children: PropTypes.node.isRequired,
+  triggerDownload: PropTypes.func.isRequired,
+  href: PropTypes.string.isRequired,
+  dlRef: PropTypes.shape({ current: PropTypes.object }).isRequired,
+};
 
 export default DownloadButtonPresentation;

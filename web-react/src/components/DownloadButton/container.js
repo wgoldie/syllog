@@ -13,20 +13,28 @@ class DownloadButtonContainer extends React.Component {
   triggerDownload = () => {
     const downloadJSON = this.props.getDownload();
     this.setState({ href: jsonToBlob(downloadJSON) });
-    debugger;
-    this.dlRef.current.click();
+  }
+
+  componentDidUpdate = () => {
+    if (this.state.href) {
+      this.dlRef.current.click();
+      this.setState({ href: '' });
+    }
   }
 
   render() {
     const { triggerDownload, dlRef } = this;
     const { href } = this.state;
     const { children } = this.props;
-    return React.createElement(Presentation, {
-      triggerDownload,
-      href,
-      dlRef,
+    return React.createElement(
+      Presentation,
+      {
+        triggerDownload,
+        href,
+        dlRef,
+      },
       children,
-    });
+    );
   }
 }
 
