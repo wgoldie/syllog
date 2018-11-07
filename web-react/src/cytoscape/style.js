@@ -13,7 +13,7 @@ export default function getStyle(theme) {
         'font-size': 8,
         'border-color': theme.border,
         color: theme.color,
-        //'background-color': theme.neutralBackground,
+        // 'background-color': theme.neutralBackground,
         'text-halign': 'center',
         'text-valign': 'center',
         'line-color': theme.border,

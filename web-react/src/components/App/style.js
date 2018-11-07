@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import theme from '../../style/defaultTheme';
 
 export const CyWrapper = styled.div`
 flex: 9

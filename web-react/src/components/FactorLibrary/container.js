@@ -114,7 +114,6 @@ class FactorLibraryContainer extends React.Component {
       makeOnClick,
       loaderRef,
       clearFactors,
-      exportFactors,
     } = this;
     const { factors } = this.state;
     return React.createElement(Presentation, {

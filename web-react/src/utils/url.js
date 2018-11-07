@@ -1,5 +1,6 @@
 
-export const jsonToBlob = (
-  data => `data:text/json;charset=utf-8,\
-  ${JSON.stringify(data, null, 2)}`
-);
+export const jsonToBlob = (data) => {
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  return URL.createObjectURL(blob);
+};

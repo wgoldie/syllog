@@ -12,6 +12,7 @@ class DownloadButtonContainer extends React.Component {
 
   triggerDownload = () => {
     const downloadJSON = this.props.getDownload();
+    console.log(JSON.stringify(downloadJSON, null, 2));
     this.setState({ href: jsonToBlob(downloadJSON) });
   }
 
@@ -25,13 +26,14 @@ class DownloadButtonContainer extends React.Component {
   render() {
     const { triggerDownload, dlRef } = this;
     const { href } = this.state;
-    const { children } = this.props;
+    const { children, ButtonRender } = this.props;
     return React.createElement(
       Presentation,
       {
         triggerDownload,
         href,
         dlRef,
+        ButtonRender,
       },
       children,
     );
@@ -41,6 +43,7 @@ class DownloadButtonContainer extends React.Component {
 DownloadButtonContainer.propTypes = {
   getDownload: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
+  ButtonRender: PropTypes.func.isRequired,
 };
 
 export default DownloadButtonContainer;
