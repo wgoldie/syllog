@@ -168,18 +168,18 @@ Todo for 0.0.1:
 - [x] Pyro support
 - [x] Predefined factors (distributions, arithmetic, etc)
 - [x] Factor definition JSON spec
-- [ ] Copy factors in editor
 - [ ] Library of predefined factors for Pyro
 - [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
 - [x] Remove factor containers
 - [ ] Variable namer in React
 - [ ] Favicon
-- [ ] Github pages
+- [ ] Github pages hosting for webapp
 
 Roadmap:
 - [ ] Validate before export
 - [ ] Transformer nodes (deterministic transforms for data)
+- [ ] Copy factors in editor
 - [ ] Swap between factor/DGM view
 - [ ] Factor layout rules
 - [ ] Nested marking menus

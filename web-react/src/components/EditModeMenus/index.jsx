@@ -12,7 +12,8 @@ const menuDefinitions = {
     ...nodeBase,
   ],
   [`node[type="${NODE_TYPES.FACTOR}"]`]: [
-    ...nodeBase,
+    rmElement,
+    renameNode,
     addFactorInput,
     addFactorOutput,
     selectFactorFunction,

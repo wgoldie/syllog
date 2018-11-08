@@ -15,6 +15,7 @@ class HeaderContainer extends React.Component {
       const json = JSON.parse(e.target.result);
       // @TODO validate model
       this.context.cy.json({ elements: json });
+      this.context.cy.layout({ name: 'dagre' }).run();
     } catch (error) {
       // TODO warn user
       console.error(error.message);

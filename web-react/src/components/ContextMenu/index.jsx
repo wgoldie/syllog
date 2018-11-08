@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
 import { CytoscapeContext } from 'react-cytoscape-tools';
+import { ThemeConsumer } from 'styled-components';
 
 class ContextMenu extends React.Component {
   constructor(props) {
@@ -14,22 +15,22 @@ class ContextMenu extends React.Component {
   }
 
   buildCommand = commandBuilder => commandBuilder(
-    this.context.cy,
+    this.props.cy,
     uuidv4,
   );
 
   buildMenus = (prevProps) => {
-    const { selector, commandBuilders } = this.props;
+    const { selector, commandBuilders, theme } = this.props;
     if (
       (prevProps.commandBuilders !== commandBuilders)
       || (prevProps.selector !== selector)
     ) {
       this.destroyMenu();
       const commands = commandBuilders.map(this.buildCommand);
-      const menu = this.context.cy.cxtmenu({
+      const menu = this.props.cy.cxtmenu({
         selector,
         commands,
-        fillColor: 'rgba(255,255,255,0.25)',
+        fillColor: theme.altBackground,
       });
 
       this.setState({ menu });
@@ -54,11 +55,22 @@ class ContextMenu extends React.Component {
   }
 }
 
-ContextMenu.contextType = CytoscapeContext;
-
 ContextMenu.propTypes = {
+  theme: PropTypes.object.isRequired,
+  cy: PropTypes.object.isRequired,
   selector: PropTypes.string.isRequired,
   commandBuilders: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
-export default ContextMenu;
+const ContextMenuWrapper = props => (
+  <CytoscapeContext.Consumer>
+    { cyContext => (
+      <ThemeConsumer>
+        { theme => (
+          <ContextMenu {...props} cy={cyContext.cy} theme={theme} />)
+        }
+      </ThemeConsumer>)
+    }
+  </CytoscapeContext.Consumer>);
+
+export default ContextMenuWrapper;

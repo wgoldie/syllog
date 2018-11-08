@@ -11,21 +11,21 @@ export default function getStyle(theme) {
       style: {
         'font-family': 'Consolas, Courier, monospace',
         'font-size': 8,
-        'border-color': theme.border,
-        color: theme.color,
+        'border-color': theme.color,
         'background-color': theme.neutralBackground,
         'text-halign': 'center',
         'text-valign': 'center',
-        'line-color': theme.border,
+        'line-color': theme.altBackground,
         'curve-style': 'bezier',
         'target-arrow-shape': 'triangle',
-        'target-arrow-color': theme.border,
       },
     },
     {
       selector: 'edge',
       style: {
         width: 0.5,
+        color: theme.altBackground,
+        opacity: 0.5,
       },
     },
     {
@@ -39,13 +39,14 @@ export default function getStyle(theme) {
       selector: `node[type="${NODE_TYPES.VARIABLE}"]`,
       style: {
         shape: 'ellipse',
+        'text-valign': 'top',
       },
     },
     {
       selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"]`,
       style: {
         'text-valign': 'top',
-        'shape': 'polygon',
+        shape: 'polygon',
         'shape-polygon-points': '-1 -1 1 -1 0 1 -1 -1',
       },
     },
@@ -53,7 +54,7 @@ export default function getStyle(theme) {
       selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
       style: {
         'text-valign': 'bottom',
-        'shape': 'polygon',
+        shape: 'polygon',
         'shape-polygon-points': '-1 1 1 1 0 -1 -1 1',
       },
     },
@@ -68,10 +69,6 @@ export default function getStyle(theme) {
           return `${d.factorFunction}:${d.name}`;
         },
       },
-    },
-    {
-      selector: 'node[color]',
-      style: { 'border-color': 'data(color)' },
     },
   ];
 
