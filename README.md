@@ -172,7 +172,7 @@ Todo for 0.0.1:
 - [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
 - [x] Remove factor containers
-- [ ] Variable namer in React
+- [x] Variable namer in React
 - [ ] Favicon
 - [ ] Github pages hosting for webapp
 
