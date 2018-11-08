@@ -19,6 +19,17 @@ export const addVariable = variableType => (cy, getVariableName) => ({
  */
 const checkEdgeValid = cy => (e, source, target, added) => {
   if (
+    (
+      (target.data().type === NODE_TYPES.FACTOR_OUTPUT
+        && source.data().type === NODE_TYPES.VARIABLE)
+      || (
+        target.data().type === NODE_TYPES.VARIABLE
+        && source.data().type === NODE_TYPES.FACTOR_INPUT
+      )
+    )
+  ) {
+    added.move({ source: target.id(), target: source.id() });
+  } else if (
     !(
       (source.data().type === NODE_TYPES.FACTOR_OUTPUT
         && target.data().type === NODE_TYPES.VARIABLE)
