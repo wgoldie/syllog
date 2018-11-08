@@ -105,35 +105,17 @@ Query nodes will be computed.
   "id": "some-unique-uuid",
   "name": "some-unique-name",
   "type": "FACTOR_CHILD_TYPE",
-  "factor": "some-factor-id",
-  "parent": "some-factor-container-id",
+  "parent": "some-factor-id",
 }
 ```
 
 `"name"` must be unique within the scope of this factor's inputs and outputs.
 `"type"` must be one of `["FACTOR_INPUT", "FACTOR_OUTPUT"]`
-`"factor"` must be the id of the factor in the graph that this input or output corresponds to.
+`"parent"` must be the id of the factor in the graph that this input or output corresponds to.
 
 In general, all factors with a given factor function should
 have the same set of names for inputs and outputs.
 E.g., every Normal distribution factor will have two inputs named "sigma" and "mu" and one output named "Z".
-
-### Factor Containers
-
-In addition to the input and output nodes, each factor is augmented with input and output container nodes.
-These are for internal use by Syllog for layout only, and can be ignored by most applications.
-
-```javascript
-{
-  "id": "some-unique-uuid",
-  "parent": "some-factor-id",
-  "type": "FACTOR_CONTAINER_TYPE",
-}
-```
-`"parent"` must be the id of the factor in the graph that this container corresponds to.
-`"type"` must be one of `["FACTOR_INPUT_CONTAINER", "FACTOR_OUTPUT_CONTAINER"]`.
-
-It is expected that these nodes will be removed soon.
 
 ### Edges
 ```javascript
@@ -190,8 +172,10 @@ Todo for 0.0.1:
 - [ ] Library of predefined factors for Pyro
 - [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
-- [ ] Remove factor containers
+- [x] Remove factor containers
 - [ ] Variable namer in React
+- [ ] Favicon
+- [ ] Github pages
 
 Roadmap:
 - [ ] Validate before export

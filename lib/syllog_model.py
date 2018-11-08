@@ -11,8 +11,6 @@ FACTOR = 'FACTOR'
 VARIABLE = 'VARIABLE'
 FACTOR_INPUT = 'FACTOR_INPUT'
 FACTOR_OUTPUT = 'FACTOR_OUTPUT'
-FACTOR_INPUT_CONTAINER = 'FACTOR_INPUT_CONTAINER'
-FACTOR_OUTPUT_CONTAINER = 'FACTOR_OUTPUT_CONTAINER'
 
 class SyllogPyroModel(object):
     """
@@ -68,10 +66,10 @@ class SyllogPyroModel(object):
                    for node in nodes 
                    if node['type'] == FACTOR]
         """
-        factor_input_edges = [(node['id'], node['factor']) 
+        factor_input_edges = [(node['id'], node['parent']) 
                               for node in nodes 
                               if node['type'] == FACTOR_INPUT]
-        factor_output_edges = [(node['factor'], node['id']) 
+        factor_output_edges = [(node['parent'], node['id']) 
                                for node in nodes 
                                if node['type'] == FACTOR_OUTPUT]
         graph = Graph(0, directed=True)

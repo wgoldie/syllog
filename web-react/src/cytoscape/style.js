@@ -42,6 +42,22 @@ export default function getStyle(theme) {
       },
     },
     {
+      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"]`,
+      style: {
+        'text-valign': 'top',
+        'shape': 'polygon',
+        'shape-polygon-points': '-1 -1 1 -1 0 1 -1 -1',
+      },
+    },
+    {
+      selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
+      style: {
+        'text-valign': 'bottom',
+        'shape': 'polygon',
+        'shape-polygon-points': '-1 1 1 1 0 -1 -1 1',
+      },
+    },
+    {
       selector: `node[type="${NODE_TYPES.FACTOR}"]`,
       style: {
         shape: 'square',
@@ -51,28 +67,6 @@ export default function getStyle(theme) {
           const d = ele.data();
           return `${d.factorFunction}:${d.name}`;
         },
-      },
-    },
-    {
-      selector: `node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`,
-      style: {
-        shape: 'square',
-        label: 'Outputs',
-        'text-valign': 'top',
-      },
-    },
-    {
-      selector: `node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`,
-      style: {
-        shape: 'square',
-        label: 'Inputs',
-        'text-valign': 'top',
-      },
-    },
-    {
-      selector: `node[type="${NODE_TYPES.FACTOR_INPUT}"],node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`,
-      style: {
-        label: 'data(name)',
       },
     },
     {

@@ -33,8 +33,6 @@ export const edgeCyJSON = (source, target) => ({
  * CyJSON for a factor node
  *
  * name must be unique among variable and factor names
- *
- * Should be inserted along with factorContainersCyJSON
  */
 export const factorCyJSON = (name, factorFunction = 'None') => ({
   data: {
@@ -46,42 +44,18 @@ export const factorCyJSON = (name, factorFunction = 'None') => ({
 });
 
 /*
- * CyJSON for a factor node's input and output containers
- *
- * factorId should be the Cytoscape id of a valid factor node
- */
-export const factorContainersCyJSON = factorId => [
-  {
-    data: {
-      id: uuidv4(),
-      type: NODE_TYPES.FACTOR_INPUT_CONTAINER,
-      parent: factorId,
-    },
-  },
-  {
-    data: {
-      id: uuidv4(),
-      type: NODE_TYPES.FACTOR_OUTPUT_CONTAINER,
-      parent: factorId,
-    },
-  },
-];
-
-/*
  * CyJSON for a factor input or output node
  *
  * name must be unique among this factor's inputs and outputs
- * parentId must be the parent factor node's input or output container's Cytoscape id
  * factorId must be the parent factor node's Cytoscape id
  * childType must be in NODE_TYPES and must be either FACTOR_INPUT or FACTOR_OUTPUT
  */
-export const factorChildCyJSON = (name, parentId, factorId, childType) => ({
+export const factorChildCyJSON = (name, factorId, childType) => ({
   data: {
     id: uuidv4(),
     name,
     type: childType,
-    parent: parentId,
-    factor: factorId,
+    parent: factorId,
   },
 });
 
@@ -89,13 +63,9 @@ export const factorChildCyJSON = (name, parentId, factorId, childType) => ({
  * Helper to produce CyJSON for
  * a factor's input with the given name.
  */
-export const factorInputForFactor = (name, factorEle) => factorChildCyJSON(
+export const factorInputForFactor = (name, factorId) => factorChildCyJSON(
   name,
-  factorEle
-    .children(`node[type="${NODE_TYPES.FACTOR_INPUT_CONTAINER}"]`)
-    .first()
-    .id(),
-  factorEle.id(),
+  factorId,
   NODE_TYPES.FACTOR_INPUT,
 );
 
@@ -103,18 +73,14 @@ export const factorInputForFactor = (name, factorEle) => factorChildCyJSON(
  * Helper to produce CyJSON for
  * a factor's output with the given name.
  */
-export const factorOutputForFactor = (name, factorEle) => factorChildCyJSON(
+export const factorOutputForFactor = (name, factorId) => factorChildCyJSON(
   name,
-  factorEle
-    .children(`node[type="${NODE_TYPES.FACTOR_OUTPUT_CONTAINER}"]`)
-    .first()
-    .id(),
-  factorEle.id(),
+  factorId,
   NODE_TYPES.FACTOR_OUTPUT,
 );
 
 /*
- * Builds a factor with input and output containers
+ * Builds a factor with a single output (at least one must exist)
  * and adds it to the graph.
  *
  * getVariableName must provide a unique name for the factor
@@ -128,6 +94,5 @@ export function makeFactor(cy, getVariableName, position = {}) {
     position,
   });
 
-  cy.add(factorContainersCyJSON(factor.id()));
-  cy.add(factorOutputForFactor(getVariableName(), factor));
+  cy.add(factorOutputForFactor(getVariableName(), factor.id()));
 }

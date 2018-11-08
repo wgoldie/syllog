@@ -20,7 +20,7 @@ export const addFactorInput = (cy, getVariableName) => ({
   select(ele) {
     const { type } = ele.data();
     if (type !== NODE_TYPES.FACTOR) return;
-    cy.add(factorInputForFactor(getVariableName(), ele));
+    cy.add(factorInputForFactor(getVariableName(), ele.id()));
   },
 });
 
@@ -29,6 +29,6 @@ export const addFactorOutput = (cy, getVariableName) => ({
   select(ele) {
     const { type } = ele.data();
     if (type !== NODE_TYPES.FACTOR) return;
-    cy.add(factorOutputForFactor(getVariableName(), ele));
+    cy.add(factorOutputForFactor(getVariableName(), ele.id()));
   },
 });

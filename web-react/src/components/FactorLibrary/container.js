@@ -5,7 +5,6 @@ import {
   factorCyJSON,
   factorOutputForFactor,
   factorInputForFactor,
-  factorContainersCyJSON,
 } from '../../cytoscape/cyJSONBuilders';
 import Presentation from './presentation';
 
@@ -86,12 +85,12 @@ class FactorLibraryContainer extends React.Component {
     const factorDefinition = factors[factorFunctionName];
     const factorNodeJSON = factorCyJSON(uuidv4(), factorFunctionName);
     const factorNode = cy.add(factorNodeJSON);
-    cy.add(factorContainersCyJSON(factorNode.id()));
+    const factorNodeId = factorNode.id();
     const inputNodesJSON = factorDefinition.inputs.map(
-      input => factorInputForFactor(input, factorNode),
+      input => factorInputForFactor(input, factorNodeId),
     );
     const outputNodesJSON = factorDefinition.outputs.map(
-      output => factorOutputForFactor(output, factorNode),
+      output => factorOutputForFactor(output, factorNodeId),
     );
 
     cy.add(inputNodesJSON);
