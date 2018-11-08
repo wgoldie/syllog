@@ -83,6 +83,7 @@ class FactorLibraryContainer extends React.Component {
     const { factors } = this.state;
     if (!cy) { return; }
     const factorDefinition = factors[factorFunctionName];
+    const { x1, y1, x2, y2 } = cy.extent();
     const factorNodeJSON = factorCyJSON(uuidv4(), factorFunctionName);
     const factorNode = cy.add(factorNodeJSON);
     const factorNodeId = factorNode.id();
@@ -95,6 +96,7 @@ class FactorLibraryContainer extends React.Component {
 
     cy.add(inputNodesJSON);
     cy.add(outputNodesJSON);
+    cy.fit();
   }
 
   // TODO: warn and confirm on this

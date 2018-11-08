@@ -162,7 +162,7 @@ Todo for 0.0.1:
 - [x] Pyro support
 - [x] Predefined factors (distributions, arithmetic, etc)
 - [x] Factor definition JSON spec
-- [ ] Library of predefined factors for Pyro
+- [x] Library of predefined factors for Pyro
 - [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
 - [x] Remove factor containers
@@ -186,3 +186,4 @@ Roadmap:
 - [ ] Code gen for Pyro ("Eject" from SyllogModel)
 - [ ] Support for probabilistic programming libraries beyond Pyro (Edwin, Stan, etc)
 - [ ] Export LaTeX graph
+- [ ] Namespacing for factor functions

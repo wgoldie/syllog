@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const pt = key => props => props.theme[key];
 
 export const Wrapper = styled.div`
-flex: 1.5;
+flex: 2;
 height: 100%;
 overflow: hidden;
 background-color: ${pt('background')};
@@ -54,7 +54,7 @@ min-height: 250px;
 
 export const FactorName = styled.span`
 display: block;
-background: ${pt('altBackground')};
+background: ${pt('hoverBackground')};
 color: ${pt('altColor')};
 left: 5px;
 border-top-right-radius: 5px;

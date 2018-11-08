@@ -34,7 +34,7 @@ export const edgeCyJSON = (source, target) => ({
  *
  * name must be unique among variable and factor names
  */
-export const factorCyJSON = (name, factorFunction = 'None') => ({
+export const factorCyJSON = (name, factorFunction = 'None', position = { x: 0, y: 0 }) => ({
   data: {
     id: uuidv4(),
     name,
@@ -88,11 +88,10 @@ export const factorOutputForFactor = (name, factorId) => factorChildCyJSON(
  * position is optional (format { x, y })
  * and will place the factor spatially
  */
-export function makeFactor(cy, getVariableName, position = {}) {
-  const factor = cy.add({
-    ...factorCyJSON(getVariableName()),
-    position,
-  });
+export function makeFactor(cy, getVariableName) {
+  const factor = cy.add(
+    factorCyJSON(getVariableName(), 'None')
+  );
 
   cy.add(factorOutputForFactor(getVariableName(), factor.id()));
 }

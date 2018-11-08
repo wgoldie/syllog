@@ -1,0 +1,279 @@
+{
+  "Bernoulli": {
+    "inputs": [
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "BernoulliLogit": {
+    "inputs": [
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Beta": {
+    "inputs": [
+      "c1",
+      "c2"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Categorical": {
+    "inputs": [
+      "p"
+    ],
+    "outputs": [
+      "c"
+    ]
+  },
+  "CategoricalLogit": {
+    "inputs": [
+      "p"
+    ],
+    "outputs": [
+      "c"
+    ]
+  },
+  "Cauchy": {
+    "inputs": [
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "ChiSq": {
+    "inputs": [
+      "df"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Dirichlet": {
+    "inputs": [
+      "c"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Exponential": {
+    "inputs": [
+      "rate"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "FisherSnedecor": {
+    "inputs": [
+      "df1",
+      "df2"
+    ],
+    "outputs": [
+      "f"
+    ]
+  },
+  "Gamma": {
+    "inputs": [
+      "concentration",
+      "rate"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Geometric": {
+    "inputs": [
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "GeometricLogit": {
+    "inputs": [
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Gumbel": {
+    "inputs": [
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Laplace": {
+    "inputs": [
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "LogisticNormal": {
+    "inputs": [
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "LogNormal": {
+    "inputs": [
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Multinomial": {
+    "inputs": [
+      "n",
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "MultinomialLogit": {
+    "inputs": [
+      "n",
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "MultivariateNormal": {
+    "inputs": [
+      "loc",
+      "cov_mat"
+    ],
+    "outputs": [
+      "z"
+    ]
+  },
+  "MultivariateNormalPrecision": {
+    "inputs": [
+      "loc",
+      "prec_mat"
+    ],
+    "outputs": [
+      "z"
+    ]
+  },
+  "Normal": {
+    "inputs": [
+      "mu",
+      "sigma"
+    ],
+    "outputs": [
+      "z"
+    ]
+  },
+  "OneHotCategorical": {
+    "inputs": [
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "OneHotCategoricalLogit": {
+    "inputs": [
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Pareto": {
+    "inputs": [
+      "scale",
+      "alpha"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Poisson": {
+    "inputs": [
+      "rate"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "RelaxedBernoulli": {
+    "inputs": [
+      "t",
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "RelaxedBernoulliLogits": {
+    "inputs": [
+      "temp",
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "RelaxedOneHotCategorical": {
+    "inputs": [
+      "temp",
+      "p"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "RelaxedOneHotCategoricalLogit": {
+    "inputs": [
+      "temp",
+      "l"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "StudentT": {
+    "inputs": [
+      "df",
+      "loc",
+      "scale"
+    ],
+    "outputs": [
+      "x"
+    ]
+  },
+  "Uniform": {
+    "inputs": [
+      "low",
+      "high"
+    ],
+    "outputs": [
+      "x"
+    ]
+  }
+}
