@@ -2,20 +2,18 @@ import styled from 'styled-components';
 
 export const HeaderWrapper = styled.h1`
   width: 100%;
-  max-height: 10px;
-  flex: 1;
   display: flex;
-  justify-content: flex-start;
+  flex-shrink: 1;
+  justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  flex: 1;
   background: ${props => props.theme.background};
   color: ${props => props.theme.color};
 
   border-color: ${props => props.theme.border};
   border-right: 1px solid;
   border-bottom: 1px solid; 
-  padding: 20px;
+  padding: 10px;
 `;
 
 export const buttonStyle = props => `
@@ -32,7 +30,8 @@ export const buttonStyle = props => `
   font-size: 100%;
   cursor: pointer;
   padding: 10px;
-  margin: 10px;
+  margin: 0 10px;
+  box-sizing: border-box;
 `;
 
 export const HeaderButton = styled.a`
@@ -49,4 +48,13 @@ export const UploadInput = styled.input`
 
 export const DownloadButtonInner = styled.button`
   ${buttonStyle}
+`;
+
+export const HeaderButtons = styled.ul`
+  display: flex;
+  flex-direction: row;
+`;
+
+export const HeaderText = styled.div`
+
 `;

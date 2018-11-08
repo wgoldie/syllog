@@ -182,7 +182,7 @@ Todo for 0.0.1:
 - [x] Variable namer
 - [x] Radial marking menus
 - [x] Allow orphaned nodes 
-- [ ] Save/load JSON flat file
+- [x] Save/load JSON flat file
 - [x] Pyro support
 - [x] Predefined factors (distributions, arithmetic, etc)
 - [x] Factor definition JSON spec
@@ -190,8 +190,8 @@ Todo for 0.0.1:
 - [ ] Library of predefined factors for Pyro
 - [x] Insert factor from library
 - [ ] Evidence/latent/target handling for Pyro 
-- [ ] Export LaTeX graph
 - [ ] Remove factor containers
+- [ ] Variable namer in React
 
 Roadmap:
 - [ ] Validate before export
@@ -207,4 +207,4 @@ Roadmap:
 - [ ] UGM models?
 - [ ] Code gen for Pyro ("Eject" from SyllogModel)
 - [ ] Support for probabilistic programming libraries beyond Pyro (Edwin, Stan, etc)
-
+- [ ] Export LaTeX graph

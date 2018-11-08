@@ -26,14 +26,14 @@ class DownloadButtonContainer extends React.Component {
   render() {
     const { triggerDownload, dlRef } = this;
     const { href } = this.state;
-    const { children, ButtonRender } = this.props;
+    const { children, buttonRender } = this.props;
     return React.createElement(
       Presentation,
       {
         triggerDownload,
         href,
         dlRef,
-        ButtonRender,
+        buttonRender,
       },
       children,
     );
@@ -43,7 +43,7 @@ class DownloadButtonContainer extends React.Component {
 DownloadButtonContainer.propTypes = {
   getDownload: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
-  ButtonRender: PropTypes.func.isRequired,
+  buttonRender: PropTypes.func.isRequired,
 };
 
 export default DownloadButtonContainer;

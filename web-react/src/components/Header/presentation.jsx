@@ -5,27 +5,38 @@ import {
   UploadLabel,
   UploadInput,
   DownloadButtonInner,
+  HeaderText,
+  HeaderButtons,
 } from './styles';
 import DownloadButton from '../DownloadButton';
 
 
 const HeaderPresentation = ({ getCyJSON, loaderRef }) => (
   <HeaderWrapper>
-    Syllog
-    <DownloadButton
-      getDownload={getCyJSON}
-      ButtonRender={DownloadButtonInner}
-    >
-      Download Model
-    </DownloadButton>
-    <UploadLabel htmlFor="model">
-      Upload Model
-      <UploadInput
-        type="file"
-        id="model"
-        ref={loaderRef}
-      />
-    </UploadLabel>
+    <HeaderText>Syllog</HeaderText>
+    <HeaderButtons>
+      <DownloadButton
+        getDownload={getCyJSON}
+        buttonRender={(onClick, children) => (
+          <DownloadButtonInner
+            role="button"
+            onClick={onClick}
+          >
+            {children}
+          </DownloadButtonInner>)
+        }
+      >
+        Download Model
+      </DownloadButton>
+      <UploadLabel htmlFor="model">
+        Upload Model
+        <UploadInput
+          type="file"
+          id="model"
+          ref={loaderRef}
+        />
+      </UploadLabel>
+    </HeaderButtons>
   </HeaderWrapper>
 );
 
