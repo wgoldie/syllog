@@ -173,7 +173,7 @@ Todo for 0.0.1:
 - [ ] Evidence/latent/target handling for Pyro 
 - [x] Remove factor containers
 - [x] Variable namer in React
-- [ ] Favicon
+- [x] Favicon
 - [ ] Github pages hosting for webapp
 
 Roadmap:
