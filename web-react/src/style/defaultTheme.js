@@ -1,5 +1,5 @@
 const white = '#fff';
-const grey = 'rgba(0, 0, 0, 0.25)';
+const grey = 'rgba(255, 255, 255, 0.25)';
 const black = '#000';
 
 const theme = {

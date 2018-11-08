@@ -18,9 +18,9 @@ export const HeaderWrapper = styled.h1`
 
 export const buttonStyle = props => `
   display: block;
-  border-color: ${props.theme.border};
-  border: 1px solid;
-  background: ${props.theme.background}
+  border: 1px solid ${props.theme.border};
+  background: ${props.theme.background};
+  color: ${props.theme.color};
   &:hover {
     background: ${props.theme.hoverBackground};
     color: ${props.theme.hoverColor};

@@ -5,7 +5,6 @@ import { drawEdge, rmElement, addLatent } from '../../graphCommands/graph';
 import { renameNode, selectFactorFunction } from '../../graphCommands/variableNameCommands';
 import { addFactorInput, addFactorOutput, addFactor } from '../../graphCommands/factorCommands';
 import { relayoutGraph } from '../../graphCommands/layoutCommands';
-import { importJSON, exportJSON } from '../../graphCommands/processCommands';
 
 const nodeBase = [drawEdge, rmElement, renameNode];
 const menuDefinitions = {
@@ -25,8 +24,6 @@ const menuDefinitions = {
     addLatent,
     relayoutGraph,
     addFactor,
-    importJSON,
-    exportJSON,
   ],
 };
 
