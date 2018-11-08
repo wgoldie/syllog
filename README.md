@@ -1,7 +1,6 @@
 # Syllog
 
 An interface and library for visual probabilistic programming.
-Currently being converted from an early prototype to beta architecture.
 Syllog targets the following workflow:
 
 1. Author model in visual PGM environment 
@@ -22,13 +21,8 @@ In addition, it is a web-based tool appropriate for teaching and academic use.
 - Javascript: webpack, babel, cytoscape, various cytoscape plugins (see `web/package.json`),
 various linting and formatting plugins (for development)
 
-# Use (legacy webapp)
-- Use `yarn` to install dependencies
-- Use `npx webpack` in `web` to build the editor 
-- Serve `web/index.html` or similar page from a webserver - `cd web; python -m http.server` works well.
-- Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
-
 # Use (react app)
+- `cd` to `web` from the project root.
 - Use `yarn` to install dependencies
 - Use `yarn start` to serve the app
 - Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
