@@ -33,7 +33,7 @@ const HeaderPresentation = ({ getCyJSON, loaderRef }) => (
         Export Model
       </DownloadButton>
       <UploadLabel htmlFor="model">
-        Export Model
+        Import Model
         <UploadInput
           type="file"
           id="model"
