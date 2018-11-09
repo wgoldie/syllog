@@ -25,31 +25,31 @@ width: 100%;
 `;
 
 export const FactorsWrapper = styled.ul`
-display: flex;
-justify-content: flex-start;
-flex-direction: column;
-align-items: center;
-padding: 10px;
-overflow-x: hidden;
-overflow-y: scroll;
-background-color: ${pt('background')};
-color: ${pt('color')};
-border-color: ${pt('border')};
-border-top: 1px solid;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: ${pt('background')};
+  color: ${pt('color')};
+  border-color: ${pt('border')};
+  border-top: 1px solid;
 `;
 
 export const Factor = styled.li`
-display: flex;
-flex-direction: column;
-justify-content: flex-start;
-overflow-x: hidden;
-overflow-y: scroll;
-width: 100%;;
-border: 1px ${pt('altBorderStyle')} ${pt('border')};
-border-radius: 5px;
-padding: 10px;
-margin: 10px;
-min-height: 250px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-x: hidden;
+  width: 100%;;
+  border: 1px ${pt('altBorderStyle')} ${pt('border')};
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  min-height: 250px;
 `;
 
 export const FactorName = styled.span`

@@ -275,5 +275,14 @@
     "outputs": [
       "x"
     ]
+  },
+  "CategoricalOutcome": {
+    "inputs": [
+      "outcome_mat",
+      "category"
+    ],
+    "outputs": [
+      "c"
+    ]
   }
 }

@@ -1,3 +1,5 @@
+import pyro
+import torch
 import pyro.distributions as dist
 
 """
@@ -99,3 +101,6 @@ def StudentT(_name, df, loc, scale):
 
 def Uniform(_name, low, high):
     return {'x': pyro.sample(_name, dist.uniform(low, high)) } 
+
+def CategoricalOutcome(_name, outcome_mat, category):
+        return { 'c': outcome_mat[torch.tensor(category).int()] }
