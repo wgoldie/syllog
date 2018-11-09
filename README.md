@@ -23,6 +23,8 @@ Please get in touch with me (my email is my Github profile) or file issues here 
 
 ![](webapp.png)
 
+You can visit the webapp at [wgoldie.github.io/syllog](http://wgoldie.github.io/syllog) or build/serve it yourself (see below).
+
 The authoring environment allows factor graphs to be created and exported.
 
 Syllog's factor graphs consist of variables (circles), factors (boxes), factor inputs (downward-pointing triangles), and factor outputs (upward-pointing triangles).
