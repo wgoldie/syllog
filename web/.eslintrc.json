@@ -1,9 +1,16 @@
-{
-  "extends": "airbnb/base",
+{ 
+  "extends": [
+    "airbnb"
+  ],
   "env": {
     "browser": true
   },
+  "parser": "babel-eslint",
+  "plugins": ["babel", "react", "import", "jsx-a11y"],
   "rules": {
-    "import/prefer-default-export": "ignore"
+    "react/sort-comp": "off",
+    "react/destructuring-assignment": "off",
+    "import/prefer-default-export": "off",
+    "consistent-return": "off"
   }
 }

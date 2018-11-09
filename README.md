@@ -1,8 +1,6 @@
 # Syllog
 
-An interface and library for visual probabilistic programming.
-Currently being converted from an early prototype to beta architecture.
-Syllog targets the following workflow:
+Syllog is an interface and library for visual probabilistic programming, targeting the following workflow:
 
 1. Author model in visual PGM environment 
 2. Export model to JSON format
@@ -11,28 +9,60 @@ Syllog targets the following workflow:
 The final step can be performed manually, using hand-coded factor definitions;
 or in a single shot, using a library of predefined, named factor functions.
 
-![](icecream.png)
+Currently, Syllog consists of a webapp for model authoring, and a Python module that runs Syllog models in Pyro
+(support for libraries beyond Pyro is a potential roadmap item).
 
 Syllog follows in the tradition of tools like Tetrad,
-but targets modern libraries and contemporary inference methods (including SVI).
-In addition, it is a web-based tool appropriate for teaching and academic use.
+but targets modern libraries and contemporary inference methods (including SVI libraries).
+In addition, the authoring component is a flexible, web-based tool ideal for teaching and academic use.
+
+Syllog is in an early beta phase.
+Please get in touch with me (my email is my Github profile) or file issues here if you find any bugs, have any feedback or roadmap input, or would like to contribute to this project.
+
+# Using the authoring environment
+
+![](webapp.png)
+
+The authoring environment allows factor graphs to be created and exported.
+
+Syllog's factor graphs consist of variables (circles), factors (boxes), factor inputs (downward-pointing triangles), and factor outputs (upward-pointing triangles).
+
+Before authoring, you should load up a library of factor definitions (see `/factors/pyro/factors.json` for an example library).
+You can create factors by inserting them from the Factors pane on the right (using the "Add" button on each factor definition),
+or through the edit menu.
+
+The edit menu is a contextual menu that can be triggered on any object in the graph by right clicking. 
+By opening the edit menu on the background, you can add factors and variables, or trigger a relayout of the graph.
+
+Opening the edit menu on a variable will allow you to remove the node, rename the node, or draw an edge to a factor input or output. 
+
+Opening the edit menu on a factor input or output will allow similar actions, but with edges possible only to variables.
+
+Finally, opening the edit menu on a factor will let you add inputs or outputs, and choose the function (distribution) used to sample this factor.
+Renaming or deleting the factor is also possible.
+Note that each factor in your graph with the same function name should have the same set of inputs or outputs.
+
+You can export or import your model using the header buttons for this purpose. Note that uploading will wipe out your current work.
+
+# Using the Python module(s)
+Check out the `notebooks/` directory for in-depth walkthroughs of how to use exported Syllog models with Pyro.
 
 # Requirements:
-- Python: PyTorch, igraph
-- Javascript: webpack, babel, cytoscape, various cytoscape plugins (see `web/package.json`),
+- Python: PyTorch, igraph, PyTorch, Pyro, Cairo (optional, for plotting)
+- Javascript: Webpack, babel, React, Cytoscape.JS, various cytoscape plugins (see `web/package.json`),
 various linting and formatting plugins (for development)
 
-# Use
-- Use `npx webpack` in `web` to build the editor
-- Serve `web/index.html` or similar page from a webserver - `cd web; python -m http.server` works well.
+# Building and serving the webapp 
+- `cd` to `web` from the project root.
+- Use `yarn` to install dependencies
+- Use `yarn start` to serve the app
 - Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
 
-
 # Data formatting
-There are currently two data formats for Syllog, each JSON-based.
+There are currently two data formats used by Syllog, each JSON-based.
 
 ## CyJSON
-The first is called "CyJSON". It is a subset of the JSON accepted by CytoscapeJS to construct elements,
+The first format is called "CyJSON". It is a subset of the JSON accepted by CytoscapeJS to construct elements,
 with some additional constraints to guarantee correct factor graph structure.
 
 It has the structure
@@ -76,9 +106,11 @@ The "data" key of each element type is described below:
 - `"name"` must be unique within the scope of all variable and factor names.
 - `"variableType"` must be one of `["LATENT", "EVIDENCE", "QUERY"]`.
 
-Latent nodes will be marginalized out. 
-Evidence nodes will be conditioned over.
-Query nodes will be computed. 
+Latent nodes are marked for marginalizing out. 
+
+Evidence nodes are marked for conditioning over.
+
+Query nodes are marked for targeted computation (by marginalizing and conditioning the nodes that are D-connected to these). 
 
 ### Factors
 ```javascript
@@ -90,8 +122,8 @@ Query nodes will be computed.
 }
 ```
 
-`"name"` must be unique within the scope of all variable and factor names.
-`"factorFunction"` is the name of a (possibly stochastic) function that will be used to compute this factor.
+- `"name"` must be unique within the scope of all variable and factor names.
+- `"factorFunction"` is the name of a (possibly stochastic) function that will be used to compute this factor.
 
 ### Factor Inputs and Outputs
 
@@ -100,35 +132,17 @@ Query nodes will be computed.
   "id": "some-unique-uuid",
   "name": "some-unique-name",
   "type": "FACTOR_CHILD_TYPE",
-  "factor": "some-factor-id",
-  "parent": "some-factor-container-id",
+  "parent": "some-factor-id",
 }
 ```
 
-`"name"` must be unique within the scope of this factor's inputs and outputs.
-`"type"` must be one of `["FACTOR_INPUT", "FACTOR_OUTPUT"]`
-`"factor"` must be the id of the factor in the graph that this input or output corresponds to.
+- `"name"` must be unique within the scope of this factor's inputs and outputs.
+- `"type"` must be one of `["FACTOR_INPUT", "FACTOR_OUTPUT"]`
+- `"parent"` must be the id of the factor in the graph that this input or output corresponds to.
 
 In general, all factors with a given factor function should
 have the same set of names for inputs and outputs.
 E.g., every Normal distribution factor will have two inputs named "sigma" and "mu" and one output named "Z".
-
-### Factor Containers
-
-In addition to the input and output nodes, each factor is augmented with input and output container nodes.
-These are for internal use by Syllog for layout only, and can be ignored by most applications.
-
-```javascript
-{
-  "id": "some-unique-uuid",
-  "parent": "some-factor-id",
-  "type": "FACTOR_CONTAINER_TYPE",
-}
-```
-`"parent"` must be the id of the factor in the graph that this container corresponds to.
-`"type"` must be one of `["FACTOR_INPUT_CONTAINER", "FACTOR_OUTPUT_CONTAINER"]`.
-
-It is expected that these nodes will be removed soon.
 
 ### Edges
 ```javascript
@@ -177,19 +191,25 @@ Todo for 0.0.1:
 - [x] Variable namer
 - [x] Radial marking menus
 - [x] Allow orphaned nodes 
-- [ ] Save/load JSON flat file
+- [x] Save/load JSON flat file
 - [x] Pyro support
 - [x] Predefined factors (distributions, arithmetic, etc)
-- [ ] Factor definition JSON spec
-- [ ] Copy factors in editor
-- [ ] Library of predefined factors for Pyro
-- [ ] Insert factor from library
-- [ ] Evidence/latent/target handling for Pyro 
-- [ ] Export LaTeX graph
+- [x] Factor definition JSON spec
+- [x] Library of predefined factors for Pyro
+- [x] Insert factor from library
+- [x] Remove factor containers
+- [x] Variable namer in React
+- [x] Favicon
+- [ ] Github pages hosting for webapp
 
 Roadmap:
-- [ ] Validate before export
+- [ ] Filename picker for save
+- [ ] Validate model before export
+- [ ] Decompose SyllogPyroModel into SyllogModel and SyllogPyroModel
+- [ ] Evidence/latent/target handling for Pyro 
+- [ ] Support for other libraries
 - [ ] Transformer nodes (deterministic transforms for data)
+- [ ] Copy factors in editor
 - [ ] Swap between factor/DGM view
 - [ ] Factor layout rules
 - [ ] Nested marking menus
@@ -201,4 +221,6 @@ Roadmap:
 - [ ] UGM models?
 - [ ] Code gen for Pyro ("Eject" from SyllogModel)
 - [ ] Support for probabilistic programming libraries beyond Pyro (Edwin, Stan, etc)
-
+- [ ] Export LaTeX graph
+- [ ] Namespacing for factor functions
+- [ ] Custom Cytoscape layout algorithm 
