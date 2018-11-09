@@ -1,7 +1,7 @@
 import React from 'react';
 import ContextMenu from '../ContextMenu';
 import { NODE_TYPES } from '../../constants/cytoscape';
-import { drawEdge, rmElement, addLatent } from '../../graphCommands/graph';
+import { drawEdge, rmElement, addLatentGeneric } from '../../graphCommands/graph';
 import { renameNode, selectFactorFunction } from '../../graphCommands/variableNameCommands';
 import { addFactorInput, addFactorOutput, addFactor } from '../../graphCommands/factorCommands';
 import { relayoutGraph } from '../../graphCommands/layoutCommands';
@@ -22,7 +22,7 @@ const menuDefinitions = {
   [`node[type="${NODE_TYPES.FACTOR_INPUT}"]`]: nodeBase,
   [`node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`]: nodeBase,
   core: [
-    addLatent,
+    addLatentGeneric,
     relayoutGraph,
     addFactor,
   ],

@@ -16,6 +16,12 @@ export const HeaderWrapper = styled.h1`
   padding: 10px;
 `;
 
+export const HeaderImage = styled.img`
+  margin: 0 13px;
+  height: 40px;
+  width: 40px;
+`;
+
 export const buttonStyle = props => `
   display: block;
   border: 1px solid ${props.theme.border};
@@ -56,5 +62,7 @@ export const HeaderButtons = styled.ul`
 `;
 
 export const HeaderText = styled.div`
-
+  display: flex;
+  font-size: 200%;
+  align-items: center;
 `;

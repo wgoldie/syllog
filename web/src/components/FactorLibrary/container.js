@@ -1,10 +1,10 @@
 import React from 'react';
 import { CytoscapeContext } from 'react-cytoscape-tools';
 import uuidv4 from 'uuid/v4';
+import { NODE_TYPES } from '../../constants/cytoscape';
 import {
   factorCyJSON,
-  factorOutputForFactor,
-  factorInputForFactor,
+  factorChildCyJSON,
 } from '../../cytoscape/cyJSONBuilders';
 import Presentation from './presentation';
 
@@ -80,23 +80,50 @@ class FactorLibraryContainer extends React.Component {
 
   addFactor = (factorFunctionName) => {
     const { cy } = this.context;
-    const { factors } = this.state;
     if (!cy) { return; }
-    const factorDefinition = factors[factorFunctionName];
-    const { x1, y1, x2, y2 } = cy.extent();
-    const factorNodeJSON = factorCyJSON(uuidv4(), factorFunctionName);
-    const factorNode = cy.add(factorNodeJSON);
-    const factorNodeId = factorNode.id();
-    const inputNodesJSON = factorDefinition.inputs.map(
-      input => factorInputForFactor(input, factorNodeId),
-    );
-    const outputNodesJSON = factorDefinition.outputs.map(
-      output => factorOutputForFactor(output, factorNodeId),
+
+    const { factors } = this.state;
+    const definition = factors[factorFunctionName];
+    const {
+      x1,
+      y1,
+      w,
+      h,
+    } = cy.extent();
+
+    const x = x1 + (w / 2);
+    const y = y1 + (h / 2);
+
+    const factorNodeJSON = factorCyJSON(
+      uuidv4(),
+      factorFunctionName,
+      { x, y },
     );
 
-    cy.add(inputNodesJSON);
-    cy.add(outputNodesJSON);
-    cy.fit();
+    const factorNode = cy.add(factorNodeJSON);
+
+    const spacing = 35;
+    const inputNodesJSON = definition.inputs.map(
+      (inputName, idx) => factorChildCyJSON(
+        inputName,
+        NODE_TYPES.FACTOR_INPUT,
+        { y, x: x + idx * spacing },
+      ),
+    );
+    const outputNodesJSON = definition.outputs.map(
+      (outputName, idx) => factorChildCyJSON(
+        outputName,
+        NODE_TYPES.FACTOR_OUTPUT,
+        { y: y + spacing, x: x + idx * spacing },
+      ),
+    );
+
+    const inputs = cy.add(inputNodesJSON);
+    const outputs = cy.add(outputNodesJSON);
+    const children = inputs.union(outputs);
+    children.move({
+      parent: factorNode.id(),
+    });
   }
 
   // TODO: warn and confirm on this

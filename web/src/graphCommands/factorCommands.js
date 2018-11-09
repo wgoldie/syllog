@@ -1,8 +1,7 @@
 import { NODE_TYPES } from '../constants/cytoscape';
 import {
-  makeFactor,
-  factorInputForFactor,
-  factorOutputForFactor,
+  factorCyJSON,
+  factorChildCyJSON,
 } from '../cytoscape/cyJSONBuilders';
 
 /*
@@ -11,24 +10,49 @@ import {
 export const addFactor = (cy, getVariableName) => ({
   content: 'Factor',
   select(ele, ev) {
-    makeFactor(cy, getVariableName, ev.position);
+    const factor = cy.add(
+      factorCyJSON(
+        getVariableName(),
+        'None',
+        ev.position,
+      ),
+    );
+
+    const child = cy.add(factorChildCyJSON(
+      getVariableName(),
+      NODE_TYPES.FACTOR_OUTPUT,
+      ev.position,
+    ));
+    child.move({ parent: factor.id() });
   },
 });
 
 export const addFactorInput = (cy, getVariableName) => ({
   content: 'Add input',
-  select(ele) {
-    const { type } = ele.data();
+  select(ele, ev) {
+    const { type, id } = ele.data();
     if (type !== NODE_TYPES.FACTOR) return;
-    cy.add(factorInputForFactor(getVariableName(), ele.id()));
+    const child = cy.add(factorChildCyJSON(
+      getVariableName(),
+      NODE_TYPES.FACTOR_OUTPUT,
+      ev.position,
+    ));
+
+    child.move({ parent: id });
   },
 });
 
 export const addFactorOutput = (cy, getVariableName) => ({
   content: 'Add output',
-  select(ele) {
-    const { type } = ele.data();
+  select(ele, ev) {
+    const { type, id } = ele.data();
     if (type !== NODE_TYPES.FACTOR) return;
-    cy.add(factorOutputForFactor(getVariableName(), ele.id()));
+    const child = cy.add(factorChildCyJSON(
+      getVariableName(),
+      NODE_TYPES.FACTOR_INPUT,
+      ev.position,
+    ));
+
+    child.move({ parent: id });
   },
 });

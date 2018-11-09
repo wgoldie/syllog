@@ -7,13 +7,18 @@ import { NODE_TYPES } from '../constants/cytoscape';
  * name must be unique among variable and factor names
  * variableType must be in VARIABLE_TYPES
  */
-export const variableCyJSON = (name, variableType) => ({
+export const variableCyJSON = (
+  name,
+  variableType,
+  position = null,
+) => ({
   data: {
     id: uuidv4(),
     name,
     type: NODE_TYPES.VARIABLE,
     variableType,
   },
+  ...(position ? { position } : {}),
 });
 
 /*
@@ -34,64 +39,39 @@ export const edgeCyJSON = (source, target) => ({
  *
  * name must be unique among variable and factor names
  */
-export const factorCyJSON = (name, factorFunction = 'None', position = { x: 0, y: 0 }) => ({
+export const factorCyJSON = (
+  name,
+  factorFunction = 'None',
+  position = null,
+) => ({
   data: {
     id: uuidv4(),
     name,
-    type: NODE_TYPES.FACTOR,
     factorFunction,
+    type: NODE_TYPES.FACTOR,
   },
+  ...(position ? { position } : {}),
 });
 
 /*
  * CyJSON for a factor input or output node
  *
  * name must be unique among this factor's inputs and outputs
- * factorId must be the parent factor node's Cytoscape id
  * childType must be in NODE_TYPES and must be either FACTOR_INPUT or FACTOR_OUTPUT
+ *
+ * Note that you must manually move this node
+ * to the correct parent factor after adding it
+ * to the graph.
  */
-export const factorChildCyJSON = (name, factorId, childType) => ({
+export const factorChildCyJSON = (
+  name,
+  childType,
+  position = null,
+) => ({
   data: {
     id: uuidv4(),
     name,
     type: childType,
-    parent: factorId,
   },
+  ...(position ? { position } : {}),
 });
-
-/*
- * Helper to produce CyJSON for
- * a factor's input with the given name.
- */
-export const factorInputForFactor = (name, factorId) => factorChildCyJSON(
-  name,
-  factorId,
-  NODE_TYPES.FACTOR_INPUT,
-);
-
-/*
- * Helper to produce CyJSON for
- * a factor's output with the given name.
- */
-export const factorOutputForFactor = (name, factorId) => factorChildCyJSON(
-  name,
-  factorId,
-  NODE_TYPES.FACTOR_OUTPUT,
-);
-
-/*
- * Builds a factor with a single output (at least one must exist)
- * and adds it to the graph.
- *
- * getVariableName must provide a unique name for the factor
- *
- * position is optional (format { x, y })
- * and will place the factor spatially
- */
-export function makeFactor(cy, getVariableName) {
-  const factor = cy.add(
-    factorCyJSON(getVariableName(), 'None')
-  );
-
-  cy.add(factorOutputForFactor(getVariableName(), factor.id()));
-}

@@ -4,13 +4,14 @@ import { variableCyJSON } from '../cytoscape/cyJSONBuilders';
 /*
  * Creates a node with the given type
  */
-export const addVariable = variableType => (cy, getVariableName) => ({
-  content: `${variableType} Node`,
+export const addVariable = (variableType, generic = false) => (cy, getVariableName) => ({
+  content: (generic ? 'Variable' : `${variableType} Variable`),
   select(ele, ev) {
-    cy.add({
-      ...variableCyJSON(getVariableName(), variableType),
-      position: ev.position,
-    });
+    cy.add(variableCyJSON(
+      getVariableName(),
+      variableType,
+      ev.position,
+    ));
   },
 });
 
@@ -78,3 +79,4 @@ export const rmElement = () => ({
 export const addQuery = addVariable(VARIABLE_TYPES.QUERY);
 export const addEvidence = addVariable(VARIABLE_TYPES.EVIDENCE);
 export const addLatent = addVariable(VARIABLE_TYPES.LATENT);
+export const addLatentGeneric = addVariable(VARIABLE_TYPES.LATENT, true);

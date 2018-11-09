@@ -6,14 +6,17 @@ import {
   UploadInput,
   DownloadButtonInner,
   HeaderText,
+  HeaderImage,
   HeaderButtons,
 } from './styles';
 import DownloadButton from '../DownloadButton';
 
-
 const HeaderPresentation = ({ getCyJSON, loaderRef }) => (
   <HeaderWrapper>
-    <HeaderText>Syllog</HeaderText>
+    <HeaderText>
+      <HeaderImage src="/favicon-96x96.png"/>
+      Syllog
+    </HeaderText>
     <HeaderButtons>
       <DownloadButton
         getDownload={getCyJSON}

@@ -1,1 +1,343 @@
-{"nodes":[{"data":{"id":"e548b19c-0824-4a13-acf9-ffd4520a9e18","name":"guess","type":"VARIABLE","variableType":"LATENT"}},{"data":{"id":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7","name":"b","type":"FACTOR","factorFunction":"Normal"}},{"data":{"id":"229b50fd-a1ef-4329-9b83-bf5d1cafb72a","type":"FACTOR_INPUT_CONTAINER","parent":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7"}},{"data":{"id":"3a13fa1e-df8d-45d6-b841-90b8b5d1aaf1","type":"FACTOR_OUTPUT_CONTAINER","parent":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7"}},{"data":{"id":"3800c749-2a1c-4eb7-9bb8-e434ef66201a","name":"N","type":"FACTOR_OUTPUT","parent":"3a13fa1e-df8d-45d6-b841-90b8b5d1aaf1","factor":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7"}},{"data":{"id":"2a29ab80-7145-41d9-aa2e-70e5432f1747","name":"d","type":"FACTOR","factorFunction":"Normal"}},{"data":{"id":"1d1dfe47-19b6-4606-b90a-43c77905fbb9","type":"FACTOR_INPUT_CONTAINER","parent":"2a29ab80-7145-41d9-aa2e-70e5432f1747"}},{"data":{"id":"f4f46ed1-d245-4781-9a80-aa93ff4b38b6","type":"FACTOR_OUTPUT_CONTAINER","parent":"2a29ab80-7145-41d9-aa2e-70e5432f1747"}},{"data":{"id":"c6502600-e5fb-446b-9c00-eb9649d79a8a","name":"N","type":"FACTOR_OUTPUT","parent":"f4f46ed1-d245-4781-9a80-aa93ff4b38b6","factor":"2a29ab80-7145-41d9-aa2e-70e5432f1747"}},{"data":{"id":"bac34586-940d-4f80-ad0e-d4bb3efff3a0","name":"weight_var","type":"VARIABLE","variableType":"LATENT"}},{"data":{"id":"2c07df3b-67fd-42b0-806a-89c981de3520","name":"mu","type":"FACTOR_INPUT","parent":"229b50fd-a1ef-4329-9b83-bf5d1cafb72a","factor":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7"}},{"data":{"id":"347833f7-dcce-46f4-b532-445e32fcba87","name":"mu","type":"FACTOR_INPUT","parent":"1d1dfe47-19b6-4606-b90a-43c77905fbb9","factor":"2a29ab80-7145-41d9-aa2e-70e5432f1747"}},{"data":{"id":"ed3c27fa-60cc-4971-8d45-605572682d29","name":"measurement","type":"VARIABLE","variableType":"LATENT"}},{"data":{"id":"aa31abf3-c113-4953-b575-431bda2ea83b","name":"measure_var","type":"VARIABLE","variableType":"LATENT"}},{"data":{"id":"3eff1535-8654-43a5-b837-cf1257b8dc1a","name":"sigma","type":"FACTOR_INPUT","parent":"229b50fd-a1ef-4329-9b83-bf5d1cafb72a","factor":"7f1eeab8-174a-4f4f-b7d2-dd16fc124fd7"}},{"data":{"id":"7d74d2eb-6b45-450a-86cc-6b0bde6c3020","name":"sigma","type":"FACTOR_INPUT","parent":"1d1dfe47-19b6-4606-b90a-43c77905fbb9","factor":"2a29ab80-7145-41d9-aa2e-70e5432f1747"}},{"data":{"id":"5b9d3efb-2e4c-4554-884a-1a797fa0f1bf","name":"weight","type":"VARIABLE","variableType":"LATENT"}}],"edges":[{"data":{"source":"e548b19c-0824-4a13-acf9-ffd4520a9e18","target":"2c07df3b-67fd-42b0-806a-89c981de3520","id":"d4dfe30c-2ceb-4720-a7fd-bedc6238d4c6"}},{"data":{"source":"bac34586-940d-4f80-ad0e-d4bb3efff3a0","target":"3eff1535-8654-43a5-b837-cf1257b8dc1a","id":"14a78682-cdcc-45cd-bcbf-128489b3855b"}},{"data":{"source":"aa31abf3-c113-4953-b575-431bda2ea83b","target":"7d74d2eb-6b45-450a-86cc-6b0bde6c3020","id":"e9318b0e-1749-44ab-a9ed-4321091306cd"}},{"data":{"source":"3800c749-2a1c-4eb7-9bb8-e434ef66201a","target":"5b9d3efb-2e4c-4554-884a-1a797fa0f1bf","id":"f5806e77-907a-4f00-94b1-e7e321f091c0"}},{"data":{"source":"5b9d3efb-2e4c-4554-884a-1a797fa0f1bf","target":"347833f7-dcce-46f4-b532-445e32fcba87","id":"c40fbf9f-cbfe-4493-b5b9-f903faa9b1b5"}},{"data":{"source":"c6502600-e5fb-446b-9c00-eb9649d79a8a","target":"ed3c27fa-60cc-4971-8d45-605572682d29","id":"df691177-fdbb-44cd-a932-ade5311386cc"}}]}
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "f2cdb49a-8fb4-4804-acfc-ae02ad94f7ff",
+        "name": "de8cdb0e-93aa-4216-a587-c1ca261bec67",
+        "type": "FACTOR",
+        "factorFunction": "Normal"
+      },
+      "position": {
+        "x": 130.75,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "id": "e9513eac-fbb7-419a-b21a-4eb4554e22e8",
+        "name": "mu",
+        "type": "FACTOR_INPUT",
+        "parent": "f2cdb49a-8fb4-4804-acfc-ae02ad94f7ff"
+      },
+      "position": {
+        "x": 50.25,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "1a130c0e-92e2-4659-baf0-528f4c731484",
+        "name": "sigma",
+        "type": "FACTOR_INPUT",
+        "parent": "f2cdb49a-8fb4-4804-acfc-ae02ad94f7ff"
+      },
+      "position": {
+        "x": 130.75,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "424df46c-5698-48ed-93be-70cfc803ed00",
+        "name": "z",
+        "type": "FACTOR_OUTPUT",
+        "parent": "f2cdb49a-8fb4-4804-acfc-ae02ad94f7ff"
+      },
+      "position": {
+        "x": 211.25,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "0c9edce8-ccfb-43be-8c3f-90733130c006",
+        "name": "f6969d97-e50e-44c2-a4c2-714cec5afbf2",
+        "type": "FACTOR",
+        "factorFunction": "Normal"
+      },
+      "position": {
+        "x": 291.75,
+        "y": 331.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "id": "1908b216-ba32-4dbc-9e83-eaf0a11042e0",
+        "name": "mu",
+        "type": "FACTOR_INPUT",
+        "parent": "0c9edce8-ccfb-43be-8c3f-90733130c006"
+      },
+      "position": {
+        "x": 211.25,
+        "y": 331.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "9c73c22f-737d-4636-a6fb-341a7c3e9302",
+        "name": "sigma",
+        "type": "FACTOR_INPUT",
+        "parent": "0c9edce8-ccfb-43be-8c3f-90733130c006"
+      },
+      "position": {
+        "x": 291.75,
+        "y": 331.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "9855dcd9-91f8-4141-90db-7cf3a7e64f5d",
+        "name": "z",
+        "type": "FACTOR_OUTPUT",
+        "parent": "0c9edce8-ccfb-43be-8c3f-90733130c006"
+      },
+      "position": {
+        "x": 372.25,
+        "y": 331.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "186e01d1-1501-4e07-a48a-ad216719a083",
+        "name": "guess",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 50.25,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "1b28e158-26b4-4681-bf80-d4bc24de1c41",
+        "name": "weight_var",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 130.75,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "b6d6fb9a-ffb7-4d23-b8fb-6de50610d5a6",
+        "name": "weight",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 211.25,
+        "y": 226.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "cd0f7fd9-28b6-485e-9bf5-4f4131d29ca3",
+        "name": "measure_var",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 291.75,
+        "y": 226.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "2689ae9f-6b46-4240-9866-9f1c77ed8223",
+        "name": "measurement",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 372.25,
+        "y": 437.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": true,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "source": "186e01d1-1501-4e07-a48a-ad216719a083",
+        "target": "e9513eac-fbb7-419a-b21a-4eb4554e22e8",
+        "id": "d6133ef9-a6da-4663-8856-ab9b3946e427"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "1b28e158-26b4-4681-bf80-d4bc24de1c41",
+        "target": "1a130c0e-92e2-4659-baf0-528f4c731484",
+        "id": "fcf5aae5-a170-4560-9791-5bca15aafc23"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "b6d6fb9a-ffb7-4d23-b8fb-6de50610d5a6",
+        "target": "1908b216-ba32-4dbc-9e83-eaf0a11042e0",
+        "id": "3b09b0e7-c57b-4e16-803a-3f17a807127d"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "424df46c-5698-48ed-93be-70cfc803ed00",
+        "target": "b6d6fb9a-ffb7-4d23-b8fb-6de50610d5a6",
+        "id": "e5c67089-4196-4dd9-bacc-4d3aea00ab68"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "cd0f7fd9-28b6-485e-9bf5-4f4131d29ca3",
+        "target": "9c73c22f-737d-4636-a6fb-341a7c3e9302",
+        "id": "335e9946-71eb-44b2-ad25-f74c320271ec"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "9855dcd9-91f8-4141-90db-7cf3a7e64f5d",
+        "target": "2689ae9f-6b46-4240-9866-9f1c77ed8223",
+        "id": "265d3a35-aa43-418c-b0e0-1a7221aa098d"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    }
+  ]
+}

@@ -190,3 +190,4 @@ Roadmap:
 - [ ] Support for probabilistic programming libraries beyond Pyro (Edwin, Stan, etc)
 - [ ] Export LaTeX graph
 - [ ] Namespacing for factor functions
+- [ ] Custom Cytoscape layout algorithm 
