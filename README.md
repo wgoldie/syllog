@@ -54,6 +54,7 @@ various linting and formatting plugins (for development)
 
 # Building and serving the webapp 
 - `cd` to `web` from the project root.
+- Modify `homepage` in `package.json` as desired.
 - Use `yarn` to install dependencies
 - Use `yarn start` to serve the app
 - Export model to `.json` file and load with Python classes. See `/notebooks` for examples.
@@ -181,28 +182,8 @@ named `functionName`
 which receives the named arguments `input1, input2, ...`
 and returns a map of named outputs `output1, ...`.
 
-# Progress
+# Roadmap 
 
-Todo for 0.0.1: 
-- [x] Import/export JSON
-- [x] Enforce unique variable names
-- [x] Scope variable names to factors (e.g. to allow for many factors with theta, sigma, etc as inputs)
-- [x] Generate variable names
-- [x] Variable namer
-- [x] Radial marking menus
-- [x] Allow orphaned nodes 
-- [x] Save/load JSON flat file
-- [x] Pyro support
-- [x] Predefined factors (distributions, arithmetic, etc)
-- [x] Factor definition JSON spec
-- [x] Library of predefined factors for Pyro
-- [x] Insert factor from library
-- [x] Remove factor containers
-- [x] Variable namer in React
-- [x] Favicon
-- [ ] Github pages hosting for webapp
-
-Roadmap:
 - [ ] Filename picker for save
 - [ ] Validate model before export
 - [ ] Decompose SyllogPyroModel into SyllogModel and SyllogPyroModel
