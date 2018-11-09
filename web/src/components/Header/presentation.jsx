@@ -10,11 +10,12 @@ import {
   HeaderButtons,
 } from './styles';
 import DownloadButton from '../DownloadButton';
+import icon from '../../icon.png';
 
 const HeaderPresentation = ({ getCyJSON, loaderRef }) => (
   <HeaderWrapper>
     <HeaderText>
-      <HeaderImage src="/favicon-96x96.png"/>
+      <HeaderImage src={icon} />
       Syllog
     </HeaderText>
     <HeaderButtons>
