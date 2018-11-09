@@ -75,9 +75,11 @@ The "data" key of each element type is described below:
 - `"name"` must be unique within the scope of all variable and factor names.
 - `"variableType"` must be one of `["LATENT", "EVIDENCE", "QUERY"]`.
 
-Latent nodes will be marginalized out. 
-Evidence nodes will be conditioned over.
-Query nodes will be computed. 
+Latent nodes are marked for marginalizing out. 
+
+Evidence nodes are marked for conditioning over.
+
+Query nodes are marked for targeted computation (by marginalizing and conditioning the nodes that are D-connected to these). 
 
 ### Factors
 ```javascript
@@ -89,8 +91,8 @@ Query nodes will be computed.
 }
 ```
 
-`"name"` must be unique within the scope of all variable and factor names.
-`"factorFunction"` is the name of a (possibly stochastic) function that will be used to compute this factor.
+- `"name"` must be unique within the scope of all variable and factor names.
+- `"factorFunction"` is the name of a (possibly stochastic) function that will be used to compute this factor.
 
 ### Factor Inputs and Outputs
 
@@ -103,9 +105,9 @@ Query nodes will be computed.
 }
 ```
 
-`"name"` must be unique within the scope of this factor's inputs and outputs.
-`"type"` must be one of `["FACTOR_INPUT", "FACTOR_OUTPUT"]`
-`"parent"` must be the id of the factor in the graph that this input or output corresponds to.
+- `"name"` must be unique within the scope of this factor's inputs and outputs.
+- `"type"` must be one of `["FACTOR_INPUT", "FACTOR_OUTPUT"]`
+- `"parent"` must be the id of the factor in the graph that this input or output corresponds to.
 
 In general, all factors with a given factor function should
 have the same set of names for inputs and outputs.
@@ -164,7 +166,6 @@ Todo for 0.0.1:
 - [x] Factor definition JSON spec
 - [x] Library of predefined factors for Pyro
 - [x] Insert factor from library
-- [ ] Evidence/latent/target handling for Pyro 
 - [x] Remove factor containers
 - [x] Variable namer in React
 - [x] Favicon
@@ -172,6 +173,8 @@ Todo for 0.0.1:
 
 Roadmap:
 - [ ] Validate before export
+- [ ] Evidence/latent/target handling for Pyro 
+- [ ] Support for other libraries
 - [ ] Transformer nodes (deterministic transforms for data)
 - [ ] Copy factors in editor
 - [ ] Swap between factor/DGM view
