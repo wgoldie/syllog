@@ -1,13 +1,13 @@
 {
-  "main.css": "/syllog/static/css/main.28fafd73.chunk.css",
-  "main.js": "/syllog/static/js/main.620fcf0d.chunk.js",
-  "main.js.map": "/syllog/static/js/main.620fcf0d.chunk.js.map",
-  "static/js/1.028ca7f1.chunk.js": "/syllog/static/js/1.028ca7f1.chunk.js",
-  "static/js/1.028ca7f1.chunk.js.map": "/syllog/static/js/1.028ca7f1.chunk.js.map",
+  "main.css": "/syllog/static/css/main.19a0e396.chunk.css",
+  "main.js": "/syllog/static/js/main.f575eb39.chunk.js",
+  "main.js.map": "/syllog/static/js/main.f575eb39.chunk.js.map",
+  "static/js/1.0c0f1032.chunk.js": "/syllog/static/js/1.0c0f1032.chunk.js",
+  "static/js/1.0c0f1032.chunk.js.map": "/syllog/static/js/1.0c0f1032.chunk.js.map",
   "runtime~main.js": "/syllog/static/js/runtime~main.98218b2b.js",
   "runtime~main.js.map": "/syllog/static/js/runtime~main.98218b2b.js.map",
-  "static/css/main.28fafd73.chunk.css.map": "/syllog/static/css/main.28fafd73.chunk.css.map",
+  "static/css/main.19a0e396.chunk.css.map": "/syllog/static/css/main.19a0e396.chunk.css.map",
   "index.html": "/syllog/index.html",
-  "precache-manifest.1dab09e5fbb19d8b1281315896aef35e.js": "/syllog/precache-manifest.1dab09e5fbb19d8b1281315896aef35e.js",
+  "precache-manifest.c61867b65eb9e81bf20bb80d05489c37.js": "/syllog/precache-manifest.c61867b65eb9e81bf20bb80d05489c37.js",
   "service-worker.js": "/syllog/service-worker.js"
 }
