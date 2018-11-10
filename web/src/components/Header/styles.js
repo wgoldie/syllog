@@ -66,3 +66,11 @@ export const HeaderText = styled.div`
   font-size: 200%;
   align-items: center;
 `;
+
+export const ExamplePicker = styled.label`
+  ${buttonStyle}
+`;
+
+export const ExampleList = styled.select`
+  margin: 0 10px;
+`;

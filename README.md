@@ -205,3 +205,5 @@ and returns a map of named outputs `output1, ...`.
 - [ ] Export LaTeX graph
 - [ ] Namespacing for factor functions
 - [ ] Custom Cytoscape layout algorithm 
+- [ ] Compile Python libraries to webassembly or similar to demo inference in-browser
+- [ ] Live modelling-inference loop with local or cloud webserver

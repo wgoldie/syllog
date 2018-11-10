@@ -1,6 +1,13 @@
 import React from 'react';
 import { CytoscapeContext } from 'react-cytoscape-tools';
 import Presentation from './presentation';
+import icecream from '../../static/icecream';
+import scale from '../../static/scale';
+
+const examplesJSON = {
+  icecream,
+  scale,
+};
 
 class HeaderContainer extends React.Component {
   constructor(props) {
@@ -31,6 +38,16 @@ class HeaderContainer extends React.Component {
     reader.readAsText(jsonFile);
   }
 
+  handleExampleChange = (e) => {
+    const example = e.target.value;
+    if (example) {
+      this.context.cy.json({
+        elements: examplesJSON[example],
+      });
+      this.context.cy.layout({ name: 'dagre' }).run();
+    }
+  }
+
   componentDidMount() {
     this.loaderRef.current.addEventListener('change', this.handleFile);
   }
@@ -40,8 +57,11 @@ class HeaderContainer extends React.Component {
   }
 
   render() {
-    const { loaderRef, getCyJSON } = this;
-    return React.createElement(Presentation, { loaderRef, getCyJSON });
+    const { loaderRef, getCyJSON, handleExampleChange } = this;
+    const examples = Object.keys(examplesJSON);
+    return React.createElement(Presentation,
+      { loaderRef, getCyJSON, examples, handleExampleChange }
+    );
   }
 }
 
