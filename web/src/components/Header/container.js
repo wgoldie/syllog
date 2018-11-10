@@ -1,12 +1,16 @@
 import React from 'react';
 import { CytoscapeContext } from 'react-cytoscape-tools';
 import Presentation from './presentation';
-import icecream from '../../static/icecream';
-import scale from '../../static/scale';
+import Icecream from '../../static/icecream';
+import Scale from '../../static/scale';
+import NaiveBayes from '../../static/naiveBayes';
+import TrueSkill from '../../static/TrueSkill';
 
 const examplesJSON = {
-  icecream,
-  scale,
+  Icecream,
+  Scale,
+  NaiveBayes,
+  TrueSkill,
 };
 
 class HeaderContainer extends React.Component {

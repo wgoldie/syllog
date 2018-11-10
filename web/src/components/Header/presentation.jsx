@@ -51,7 +51,7 @@ const HeaderPresentation = ({
         Load example:
         <ExampleList onChange={handleExampleChange}>
           {
-            [<option key="" value="">Examples</option>].concat(
+            [<option key="" value="">---Examples---</option>].concat(
               examples.map(example => (
                 <option key={example} value={example}>
                   {example}

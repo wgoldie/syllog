@@ -1,0 +1,343 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "66315b17-0eee-4333-8420-a0ecfbd038cb",
+        "name": "a",
+        "factorFunction": "GaussianMixture",
+        "type": "FACTOR"
+      },
+      "position": {
+        "x": 251.5,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "id": "b7f92eed-b8cd-482d-af98-85bfda0749c6",
+        "name": "y",
+        "type": "FACTOR_OUTPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 50.25,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "53872ea6-e650-4aa9-a237-ed13c41687ba",
+        "name": "x_1",
+        "type": "FACTOR_INPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 130.75,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "25918681-649d-4ad0-b19f-794fa85e4627",
+        "name": "x_2",
+        "type": "FACTOR_INPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 211.25,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "c4a49ceb-e21d-49e8-8ac4-06ab5d1fd629",
+        "name": "x_3",
+        "type": "FACTOR_INPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 291.75,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "059eed53-cf54-472c-9327-bfb24b284b8c",
+        "name": "x_4",
+        "type": "FACTOR_INPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 372.25,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "ef104a8f-ca05-4256-84dd-c4897dcf79f3",
+        "name": "x_5",
+        "type": "FACTOR_INPUT",
+        "parent": "66315b17-0eee-4333-8420-a0ecfbd038cb"
+      },
+      "position": {
+        "x": 452.75,
+        "y": 120.75
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "55a67af4-d646-4037-a840-08f9a0d7d5ff",
+        "name": "f_1",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 130.75,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "ba57b8f0-2e69-4db2-a957-058ffff4f2b4",
+        "name": "f_2",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 211.25,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "id": "d6b48c0b-8edf-43f1-bc0a-c3f6071ad437",
+        "name": "f_3",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 291.75,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "26e0ae06-a92b-4e9e-b83f-18f6e04f2570",
+        "name": "f_4",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 372.25,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "7ff51d71-d7ef-42ac-9885-6714ddc5c442",
+        "name": "f_5",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 452.75,
+        "y": 15.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    },
+    {
+      "data": {
+        "id": "c466611b-4961-4267-8800-7f12181b40db",
+        "name": "class",
+        "type": "VARIABLE",
+        "variableType": "LATENT"
+      },
+      "position": {
+        "x": 50.25,
+        "y": 226.25
+      },
+      "group": "nodes",
+      "removed": false,
+      "selected": true,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": "eh-preview-active"
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "source": "55a67af4-d646-4037-a840-08f9a0d7d5ff",
+        "target": "53872ea6-e650-4aa9-a237-ed13c41687ba",
+        "id": "7733d6ee-8692-4c54-8e4d-221d48569f32"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "ba57b8f0-2e69-4db2-a957-058ffff4f2b4",
+        "target": "25918681-649d-4ad0-b19f-794fa85e4627",
+        "id": "6b46dae1-a3b0-461f-af99-572f9d8de32f"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "d6b48c0b-8edf-43f1-bc0a-c3f6071ad437",
+        "target": "c4a49ceb-e21d-49e8-8ac4-06ab5d1fd629",
+        "id": "4201baaf-43b5-4d58-86aa-73c06320d395"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "26e0ae06-a92b-4e9e-b83f-18f6e04f2570",
+        "target": "059eed53-cf54-472c-9327-bfb24b284b8c",
+        "id": "1d2707a7-7371-4aa2-9296-7cf86cce280b"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "7ff51d71-d7ef-42ac-9885-6714ddc5c442",
+        "target": "ef104a8f-ca05-4256-84dd-c4897dcf79f3",
+        "id": "7ad9d187-084b-4172-a468-c8fe1b587fee"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    },
+    {
+      "data": {
+        "source": "b7f92eed-b8cd-482d-af98-85bfda0749c6",
+        "target": "c466611b-4961-4267-8800-7f12181b40db",
+        "id": "afd54750-58af-477b-ac08-af744b25e827"
+      },
+      "position": {},
+      "group": "edges",
+      "removed": false,
+      "selected": false,
+      "selectable": true,
+      "locked": false,
+      "grabbable": true,
+      "classes": ""
+    }
+  ]
+}

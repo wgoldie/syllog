@@ -187,11 +187,12 @@ and returns a map of named outputs `output1, ...`.
 # Roadmap 
 
 - [ ] Filename picker for save
+- [ ] Enforce input/output homogenity over factors with the same function 
 - [ ] Validate model before export
 - [ ] Decompose SyllogPyroModel into SyllogModel and SyllogPyroModel
 - [ ] Evidence/latent/target handling for Pyro 
 - [ ] Support for other libraries
-- [ ] Transformer nodes (deterministic transforms for data)
+- [ ] Deterministic nodes (deterministic transforms for data)
 - [ ] Copy factors in editor
 - [ ] Swap between factor/DGM view
 - [ ] Factor layout rules
@@ -199,7 +200,7 @@ and returns a map of named outputs `output1, ...`.
 - [ ] D-separation preview
 - [ ] LaTeX text rendering
 - [ ] Evidence/latent/target handling
-- [ ] Example models
+- [x] Example models
 - [ ] Plates
 - [ ] UGM models?
 - [ ] Code gen for Pyro ("Eject" from SyllogModel)
@@ -209,3 +210,5 @@ and returns a map of named outputs `output1, ...`.
 - [ ] Custom Cytoscape layout algorithm 
 - [ ] Compile Python libraries to webassembly or similar to demo inference in-browser
 - [ ] Live modelling-inference loop with local or cloud webserver
+- [ ] Notes field for model, factor definitions
+

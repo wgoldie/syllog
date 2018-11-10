@@ -34,7 +34,7 @@ export const addFactorInput = (cy, getVariableName) => ({
     if (type !== NODE_TYPES.FACTOR) return;
     const child = cy.add(factorChildCyJSON(
       getVariableName(),
-      NODE_TYPES.FACTOR_OUTPUT,
+      NODE_TYPES.FACTOR_INPUT,
       ev.position,
     ));
 
@@ -49,7 +49,7 @@ export const addFactorOutput = (cy, getVariableName) => ({
     if (type !== NODE_TYPES.FACTOR) return;
     const child = cy.add(factorChildCyJSON(
       getVariableName(),
-      NODE_TYPES.FACTOR_INPUT,
+      NODE_TYPES.FACTOR_OUTPUT,
       ev.position,
     ));
 
