@@ -17,6 +17,7 @@ but targets modern libraries and contemporary inference methods (including SVI l
 In addition, the authoring component is a flexible, web-based tool ideal for teaching and academic use.
 
 Syllog is in an early beta phase.
+It is very important to me that potential users are able to provide input and influence the direction of the project.
 Please get in touch with me (my email is my Github profile) or file issues here if you find any bugs, have any feedback or roadmap input, or would like to contribute to this project.
 
 # Using the authoring environment
@@ -25,7 +26,25 @@ Please get in touch with me (my email is my Github profile) or file issues here 
 
 You can visit the webapp at [wgoldie.github.io/syllog](http://wgoldie.github.io/syllog) or build/serve it yourself (see below).
 
-The authoring environment allows factor graphs to be created and exported.
+## Directed Factor Graphs
+
+The authoring environment allows directed factor graphs to be created and exported.
+These are essentially directed graphical models that encode the relevant probability distributions explicitly in factors.
+Note that directed factor graphs are still DAGs, and not equivalent to undirected factor graph models (though Syllog may support those in the future).]
+Obtaining a directed factor graph from a traditional DGM is trivial: 
+one should place a factor above each node and connect each of the node's parents to that factor. 
+The original parents should then be disconnected from the node.
+
+Directed factor graphs as implemented by Syllog have slightly greater expressive power than traditional DGMs,
+because the factors may each have several ouputs.
+For instance, in the case of a multivariate Gaussian, each output dimension could be output to a separate node.
+In another application, we could present a VAE model that samples latent codes using a Gaussian approximating distribution *q* as the model below:
+
+![](vae.png)
+
+Note that the factor for the encoder has multiple children, but it is clear that the same stochastic function (which might be a feedforward network, in this case) generated both the mean and variance for the variational approximation. In a traditional DGM, we would simply see edges from the encoder parameter node to each of the variational parameter nodes, and edges from the encoder input node to each of the variational parameter nodes.
+
+Syllog's models are designed to explicitly encode this kind of computational (in)dependence property, in addition to the statistical independence properties expressed by graphical models in general. This encoding helps bridge the gap between theoretical analysis of a model and the concrete implementation of it.
 
 Syllog's factor graphs consist of variables (circles), factors (boxes), factor inputs (downward-pointing triangles), and factor outputs (upward-pointing triangles).
 
@@ -205,7 +224,7 @@ and returns a map of named outputs `output1, ...`.
 - [ ] UGM models?
 - [ ] Code gen for Pyro ("Eject" from SyllogModel)
 - [ ] Support for probabilistic programming libraries beyond Pyro (Edwin, Stan, etc)
-- [ ] Export LaTeX graph
+- [WIP] Export LaTeX graph
 - [ ] Namespacing for factor functions
 - [ ] Custom Cytoscape layout algorithm 
 - [ ] Compile Python libraries to webassembly or similar to demo inference in-browser

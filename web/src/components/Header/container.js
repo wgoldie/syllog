@@ -5,10 +5,12 @@ import Icecream from '../../static/icecream';
 import Scale from '../../static/scale';
 import NaiveBayes from '../../static/naiveBayes';
 import TrueSkill from '../../static/TrueSkill';
+import VAE from '../../static/VAE';
 
 const examplesJSON = {
   Icecream,
   Scale,
+  VAE,
   NaiveBayes,
   TrueSkill,
 };
