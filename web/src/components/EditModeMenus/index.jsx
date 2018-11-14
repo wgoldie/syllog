@@ -23,7 +23,7 @@ const menuDefinitions = {
   [`node[type="${NODE_TYPES.FACTOR_INPUT}"]`]: nodeBase,
   [`node[type="${NODE_TYPES.FACTOR_OUTPUT}"]`]: nodeBase,
   core: [
-    exportTikz,
+    //    exportTikz,
     addLatentGeneric,
     relayoutGraph,
     addFactor,

@@ -7,8 +7,7 @@ import {
   factorChildCyJSON,
 } from '../../cytoscape/cyJSONBuilders';
 import Presentation from './presentation';
-
-const defaultFactors = {};
+import defaultFactors from '../../static/factors';
 
 // TODO warn user
 const warnInvalid = name => console.log(`\
